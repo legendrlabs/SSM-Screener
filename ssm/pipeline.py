@@ -152,6 +152,7 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
         for k, v in filing_risk_flags(txt).items():
             setattr(c, k, v)
         d, warnings = heuristic_extract_dilution(txt, common)
+        d.atm_remaining_usd = max(d.atm_remaining_usd, extract_atm_remaining_usd(txt))
         c.dilution = apply_override(d, overrides.get(c.ticker, {}))
         c.data_warnings.extend(warnings)
     elif c.dilution.confidence != "high":

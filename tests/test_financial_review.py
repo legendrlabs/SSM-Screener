@@ -45,3 +45,12 @@ def test_cover_page_common_shares_sums_classes():
 def test_extract_atm_remaining_usd():
     text="Approximately $50.0 million remained available under the at-the-market sales agreement."
     assert extract_atm_remaining_usd(text)==50_000_000
+
+
+def test_cover_parser_ignores_note_section():
+    text=(
+        "FORM 10-Q As of August 10, 2026, there were 20,000,000 shares of common stock outstanding. "
+        "PART I Item 1. Financial Statements. "
+        "A later note says 1,100,000 shares of common stock outstanding under an award plan."
+    )
+    assert cover_page_common_shares(text)==20_000_000

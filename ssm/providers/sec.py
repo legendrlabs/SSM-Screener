@@ -7,9 +7,15 @@ SEC_DATA_BASE="https://data.sec.gov"
 
 class SecClient:
     def __init__(self,user_agent=None,pause=.20,max_retries=3):
-        self.user_agent=user_agent or os.getenv("SEC_USER_AGENT","")
-        if not self.user_agent:
+        raw_user_agent=user_agent or os.getenv("SEC_USER_AGENT","")
+        if not raw_user_agent:
             raise RuntimeError("Set SEC_USER_AGENT='Organization ContactEmail' before live SEC requests.")
+        # Python HTTP headers are latin-1 encoded. SEC identification strings should
+        # therefore be ASCII-safe. Preserve ASCII contact details (especially email)
+        # and drop non-ASCII display-name characters rather than crashing before I/O.
+        self.user_agent=raw_user_agent.encode("ascii","ignore").decode("ascii").strip()
+        if not self.user_agent:
+            raise RuntimeError("SEC_USER_AGENT became empty after ASCII normalization.")
         self.pause=pause
         self.max_retries=max_retries
         self.s=requests.Session()

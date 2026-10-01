@@ -24,6 +24,7 @@ def evaluate_gates(c: Candidate, cfg):
     fin_age=_age_days(c.latest_financial_filing_date)
     if fin_age is None: return "DATA_HOLD", ["Latest 10-Q/10-K date unavailable."]
     if fin_age > cfg["financial_filing_max_age_days"]: return "DATA_HOLD", ["Financial filing is stale."]
+    if not c.financial_review_complete: return "DATA_HOLD", ["Latest 10-Q/10-K second-pass review is incomplete."]
     if c.adv20_usd is None: reasons.append("ADV20 unavailable.")
     elif c.adv20_usd < cfg["adv20_watch_min"]: return "REJECT", ["Too illiquid for practical execution."]
     elif c.adv20_usd < cfg["adv20_pass_min"]: reasons.append("Liquidity only qualifies for WATCH.")

@@ -1,0 +1,1 @@
+Restart latest exhibit second-pass scan; stale scan should be cancelled by concurrency policy.

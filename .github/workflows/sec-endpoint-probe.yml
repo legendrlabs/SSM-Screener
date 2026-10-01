@@ -1,0 +1,40 @@
+name: SEC Endpoint Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".sec-probe/**"
+      - ".github/workflows/sec-endpoint-probe.yml"
+
+jobs:
+  probe:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Probe official SEC endpoints
+        shell: bash
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: |
+          set -u
+          UA="${SEC_USER_AGENT:-SSM-Screener/0.1 contact=example@example.com}"
+          probe () {
+            name="$1"
+            url="$2"
+            code=$(curl -L -sS -o /tmp/sec_probe_body -w "%{http_code}" \
+              -A "$UA" \
+              -H "Accept-Encoding: gzip, deflate" \
+              --max-time 20 "$url" || true)
+            bytes=$(wc -c < /tmp/sec_probe_body 2>/dev/null || echo 0)
+            echo "$name|$code|$bytes|$url"
+          }
+          probe "company_tickers" "https://www.sec.gov/files/company_tickers_exchange.json"
+          sleep 1
+          probe "submissions_api" "https://data.sec.gov/submissions/CIK0000320193.json"
+          sleep 1
+          probe "companyfacts_api" "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json"
+          sleep 1
+          probe "latest_8k_atom" "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&count=10&output=atom"
+          sleep 1
+          probe "daily_index" "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/master.20261001.idx"

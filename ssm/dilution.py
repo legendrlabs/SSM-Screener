@@ -6,7 +6,7 @@ from .models import Dilution
 NUM = r"([\d,.]+)\s*(million|thousand|m|k)?"
 
 def _to_num(raw, unit):
-    n = float(raw.replace(",", "")); u=(unit or "").lower()
+    try:\n        n = float(str(raw).replace(",", "").strip())\n    except (TypeError, ValueError):\n        return 0.0\n    u=(unit or "").lower()
     if u in ("million","m"): n *= 1_000_000
     elif u in ("thousand","k"): n *= 1_000
     return n

@@ -1,25 +1,33 @@
 name: SSM Daily Scan
+
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".scan-trigger/**"
   schedule:
     - cron: "30 11 * * 1-5"
     - cron: "30 22 * * 1-5"
 
 jobs:
   scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+    timeout-minutes: 14
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
+          cache: "pip"
       - run: pip install -e .
       - name: Run screener
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           SSM_MARKET_PROVIDER: yfinance
+          SSM_SEC_DISCOVERY_MODE: atom
         run: ssm scan --days 7 --out output
       - name: Commit outputs
         run: |

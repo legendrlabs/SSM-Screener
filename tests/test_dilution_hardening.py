@@ -14,3 +14,14 @@ def test_malformed_quantity_does_not_raise():
     )
     assert d.warrants_itm_shares == 0
     assert warnings
+
+
+def test_prefunded_count_each_one_share():
+    text="9,972,424 pre-funded warrants were issued, each exercisable for one share of common stock."
+    d,_=heuristic_extract_dilution(text,11_591_124)
+    assert d.pre_funded_shares==9_972_424
+
+def test_warrant_aggregate_underlying_shares():
+    text="The new warrants are exercisable to purchase up to 8,148,000 shares of common stock."
+    d,_=heuristic_extract_dilution(text,4_000_000)
+    assert d.warrants_itm_shares==8_148_000

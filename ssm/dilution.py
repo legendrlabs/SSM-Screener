@@ -36,6 +36,8 @@ def heuristic_extract_dilution(text: str, common_shares: float = 0.0) -> Tuple[D
     d = Dilution(common_shares=common_shares, source="heuristic filing-text parser", confidence="low")
     warnings = []
     d.pre_funded_shares = _first([
+        rf"pre[- ]funded warrants?\s+outstanding\s+(?:was|were|is|are|of|:)\s*{NUM}",
+        rf"{NUM}\s+pre[- ]funded warrants?\s+(?:were|are)\s+outstanding",
         rf"pre[- ]funded warrants?.{{0,220}}?(?:purchase|acquire|representing|exercisable for|underlying).{{0,120}}?(?:up to\s+|an aggregate of\s+)?{NUM}\s+shares",
         rf"{NUM}\s+shares.{{0,160}}?pre[- ]funded warrants?",
         rf"{NUM}\s+pre[- ]funded warrants?.{{0,220}}?each.{{0,80}}?(?:one|1)\s+share",

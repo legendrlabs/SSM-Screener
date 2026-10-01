@@ -78,6 +78,10 @@ ssm scan --days 7 --out output
 
 SEC filing의 warrant / convert / preferred 구조는 표준 XBRL 태그가 없는 경우가 많기 때문에 완전 자동화가 불가능합니다. 검증된 숫자는 `config/overrides.json`에 기록하고 source/as-of를 남깁니다.
 
+미해결 희석 항목은 다른 공시나 첨부자료에 희석 언급이 없다는 이유로 해소되지 않습니다. 신뢰도가 low이면 DATA_HOLD를 유지하고 완전희석 시총·FD 배수·완전희석 총주식수는 빈칸으로 출력합니다. 추출한 개별 숫자는 검토용이며, 현재 잔량과 과거 발행·행사 수량 및 역분할 조정 여부를 대조하기 전에는 확정 cap table이 아닙니다.
+
+결과 파일은 하나의 스냅샷으로 보관·게시합니다. `quality.json`의 `source_commit`, `workflow_run_id`, `generated_at`으로 실행 출처를 확인할 수 있으며, 새 코드 또는 더 나중 실행의 결과가 존재하면 오래된 실행은 게시하지 않습니다.
+
 ## v0.1 범위
 
 1. SEC recent filing scanner

@@ -63,3 +63,11 @@ def test_same_sentence_unresolved_common_warrants_hold():
         'and common warrants with quantities specified elsewhere.', 10_000_000)
     assert d.confidence == 'low'
     assert warnings
+
+
+def test_agpu_outstanding_prefunded_count_precedes_historical_issuance():
+    d, _ = heuristic_extract_dilution(
+        'The Company sold 4,366,703 shares or pre-funded warrants in the Cash PIPE. '
+        'The total number of pre-funded warrants outstanding was 9,972,424 as of June 30, 2026.',
+        11_591_124)
+    assert d.pre_funded_shares == 9_972_424

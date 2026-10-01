@@ -19,7 +19,7 @@ def write_outputs(candidates,cfg,out_dir):
     else:(out/"candidates.csv").write_text("",encoding="utf-8")
     with (out/"dilution_check.csv").open("w",newline="",encoding="utf-8-sig") as f:
         fields=["ticker","common_shares","near_fd_shares","strict_fd_shares","fd_ratio","atm_remaining_usd","atm_ratio","confidence","source"];w=csv.DictWriter(f,fieldnames=fields);w.writeheader()
-        for c in candidates:w.writerow({"ticker":c.ticker,"common_shares":c.dilution.common_shares,"near_fd_shares":c.dilution.near_fd_shares,"strict_fd_shares":c.dilution.strict_fd_shares,"fd_ratio":c.dilution.fd_ratio,"atm_remaining_usd":c.dilution.atm_remaining_usd,"atm_ratio":c.atm_ratio(),"confidence":c.dilution.confidence,"source":c.dilution.source})
+        for c in candidates:w.writerow({"ticker":c.ticker,"common_shares":c.dilution.common_shares,"near_fd_shares":c.dilution.near_fd_shares if c.dilution.confidence != 'low' else None,"strict_fd_shares":c.dilution.strict_fd_shares if c.dilution.confidence != 'low' else None,"fd_ratio":c.dilution.fd_ratio,"atm_remaining_usd":c.dilution.atm_remaining_usd,"atm_ratio":c.atm_ratio(),"confidence":c.dilution.confidence,"source":c.dilution.source})
     with (out/"event_ledger.csv").open("w",newline="",encoding="utf-8-sig") as f:
         fields=["ticker","event_date","form","event_type","event_proof","accession","summary","gate_status","bucket"];w=csv.DictWriter(f,fieldnames=fields);w.writeheader()
         for c in candidates:w.writerow({"ticker":c.ticker,"event_date":c.latest_event_date,"form":c.latest_event_form,"event_type":c.event_type,"event_proof":c.event_proof,"accession":c.latest_event_accession,"summary":c.event_summary,"gate_status":c.gate_status,"bucket":c.bucket})

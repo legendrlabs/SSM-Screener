@@ -30,7 +30,7 @@ class Dilution:
 
     @property
     def fd_ratio(self) -> Optional[float]:
-        return self.strict_fd_shares / self.common_shares if self.common_shares > 0 else None
+        return self.strict_fd_shares / self.common_shares if self.common_shares > 0 and self.confidence != 'low' else None
 
 @dataclass
 class Candidate:
@@ -77,9 +77,11 @@ class Candidate:
         return self.price * self.dilution.common_shares if self.price is not None and self.dilution.common_shares > 0 else None
 
     def near_fd_market_cap(self):
+        if self.dilution.confidence == 'low': return None
         return self.price * self.dilution.near_fd_shares if self.price is not None and self.dilution.near_fd_shares > 0 else None
 
     def strict_fd_market_cap(self):
+        if self.dilution.confidence == 'low': return None
         return self.price * self.dilution.strict_fd_shares if self.price is not None and self.dilution.strict_fd_shares > 0 else None
 
     def nav_coverage(self):

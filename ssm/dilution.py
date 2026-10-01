@@ -3,7 +3,7 @@ import re
 from typing import Dict, Tuple
 from .models import Dilution
 
-NUM = r"(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)?"\nUSD = r"\\$\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*(million|thousand|m|k)?"
+NUM = r"(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)?"
 
 def _to_num(raw, unit):
     try:
@@ -31,7 +31,6 @@ def heuristic_extract_dilution(text: str, common_shares: float = 0.0) -> Tuple[D
     t = re.sub(r"\s+", " ", text or "")
     d = Dilution(common_shares=common_shares, source="heuristic filing-text parser", confidence="low")
     warnings = []
-
     d.pre_funded_shares = _first([
         rf"pre[- ]funded warrants?.{{0,180}}?(?:purchase|acquire|representing|exercisable for|underlying).{{0,100}}?{NUM}\s+shares",
         rf"{NUM}\s+shares.{{0,140}}?pre[- ]funded warrants?",
@@ -41,7 +40,6 @@ def heuristic_extract_dilution(text: str, common_shares: float = 0.0) -> Tuple[D
     ], t)
     if d.pre_funded_shares > 0 and d.warrants_itm_shares == d.pre_funded_shares:
         d.warrants_itm_shares = 0.0
-
     d.converts_shares = _first([
         rf"convertible (?:notes?|debentures?).{{0,220}}?convertible into.{{0,120}}?{NUM}\s+shares",
         rf"{NUM}\s+shares.{{0,160}}?convertible (?:notes?|debentures?)",
@@ -52,26 +50,19 @@ def heuristic_extract_dilution(text: str, common_shares: float = 0.0) -> Tuple[D
     d.sbc_rsus_shares = _first([
         rf"(?:restricted stock units?|rsus).{{0,160}}?(?:representing|covering|for)?.{{0,80}}?{NUM}\s+shares"
     ], t)
-    d.atm_remaining_usd = _first([
-        rf"{USD}.{{0,100}}?(?:remaining|remain(?:ed|s)?|available).{{0,140}}?(?:at-the-market|sales agreement)",
-        rf"(?:at-the-market|sales agreement).{{0,180}}?{USD}.{{0,100}}?(?:remaining|remain(?:ed|s)?|available)",
-    ], t)
-
     material = bool(re.search(
         r"pre[- ]funded|warrant|convertible|preferred stock|preferred shares|\batm\b|at-the-market|equity line",
         t,
         re.I,
     ))
-    extracted_any = any(x > 0 for x in [
+    extracted = sum([
         d.pre_funded_shares,
         d.warrants_itm_shares,
         d.converts_shares,
         d.preferred_shares_equiv,
         d.sbc_rsus_shares,
-        d.atm_remaining_usd,
     ])
-
-    if material and not extracted_any:
+    if material and extracted == 0:
         warnings.append("Material dilution language found but no reliable share quantity extracted.")
     elif common_shares > 0:
         d.confidence = "medium"

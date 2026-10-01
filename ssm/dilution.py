@@ -3,6 +3,7 @@ import re
 from typing import Dict, Tuple
 from .models import Dilution
 from .financial_review import visible_filing_text
+from .capital_evidence import preferred_signal_text, outstanding_warrant_units
 
 NUM = r"(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)?"
 
@@ -28,8 +29,9 @@ def _first(patterns, text):
             return value
     return 0.0
 
-def heuristic_extract_dilution(text: str, common_shares: float = 0.0) -> Tuple[Dilution, list[str]]:
+def heuristic_extract_dilution(text: str, common_shares: float = 0.0, *, event_context: bool = False) -> Tuple[Dilution, list[str]]:
     t = visible_filing_text(text)
+    preferred_text = preferred_signal_text(t)
     clauses = re.split(r'(?<=[.;])\s+', t)
     def scope(pattern):
         return ' ; '.join(clause for clause in clauses if re.search(pattern, clause, re.I))
@@ -56,15 +58,22 @@ def heuristic_extract_dilution(text: str, common_shares: float = 0.0) -> Tuple[D
     ], scope(r'convertible (?:notes?|debentures?)'))
     d.preferred_shares_equiv = _first([
         rf"preferred (?:stock|shares).{{0,220}}?convertible into.{{0,120}}?{NUM}\s+shares"
-    ], scope(r'preferred (?:stock|shares)'))
+    ], preferred_text)
     d.sbc_rsus_shares = _first([
         rf"(?:restricted stock units?|rsus).{{0,160}}?(?:representing|covering|for)?.{{0,80}}?{NUM}\s+shares"
     ], scope(r'restricted stock units?|\brsus\b'))
+    units = outstanding_warrant_units(text)
+    if units:
+        d.warrant_units_as_of, d.pre_funded_warrants_outstanding, d.ordinary_warrants_outstanding = units
+        # Historical offering quantities elsewhere are not the table's current
+        # share equivalents. Keep units distinct until exercise/reset terms are verified.
+        d.pre_funded_shares = d.warrants_itm_shares = 0.0
+        warnings.append('Outstanding warrant units reconciled; common-share equivalents and exercise/reset terms remain unresolved.')
     material = bool(re.search(
-        r"pre[- ]funded|warrant|convertible|preferred stock|preferred shares|\batm\b|at-the-market|equity line",
+        r"pre[- ]funded|warrant|convertible|\batm\b|at-the-market|equity line",
         t,
         re.I,
-    ))
+    ) or re.search(r'preferred (?:stock|shares)', preferred_text, re.I))
     extracted = sum([
         d.pre_funded_shares,
         d.warrants_itm_shares,
@@ -81,9 +90,19 @@ def heuristic_extract_dilution(text: str, common_shares: float = 0.0) -> Tuple[D
         (r'preferred (?:stock|shares)', d.preferred_shares_equiv, 'preferred shares'),
     ]
     for pattern, quantity, label in checks:
-        scope = ordinary if label == 'ordinary warrants' else t
-        if re.search(pattern, scope, re.I) and quantity <= 0:
+        check_text = ordinary if label == 'ordinary warrants' else preferred_text if label == 'preferred shares' else t
+        if re.search(pattern, check_text, re.I) and quantity <= 0:
             warnings.append(f'Unresolved share quantity for {label}.')
+    share_terms = r'\bshares\b|\bcommon stock\b|\bequity\b'
+    transaction = re.search(r'merger agreement|merger consideration|reverse merger|business combination agreement|(?:completed|consummated|entered into)\s+(?:the\s+|a\s+)?(?:merger|business combination)|earn[- ]?out', t, re.I)
+    current_earnouts = scope(r'earn[- ]?out')
+    current_earnouts = (re.search(share_terms, current_earnouts, re.I)
+                        and re.search(r'outstanding|remaining|contingent|payable|will issue', current_earnouts, re.I))
+    if (event_context and transaction) or current_earnouts:
+        # Historical consideration may already be in common shares, while
+        # contingent earnouts may be incremental. Neither is proven by a raw
+        # issued-share count; require reconciliation before certifying FD.
+        warnings.append('Unresolved incremental share obligations for merger consideration or earnout.')
     if not warnings and common_shares > 0:
         d.confidence = "medium"
     return d, warnings

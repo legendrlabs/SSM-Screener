@@ -53,6 +53,17 @@ def conservative_merge_dilution(current: Dilution, financial: Dilution) -> Dilut
         out.confidence = "high"
     for field in DILUTION_FIELDS:
         setattr(out, field, max(float(getattr(current, field, 0) or 0), float(getattr(financial, field, 0) or 0)))
+    unit_evidence = [d for d in (current, financial) if d.warrant_units_as_of]
+    if unit_evidence:
+        latest_date = max(d.warrant_units_as_of for d in unit_evidence)
+        latest = [d for d in unit_evidence if d.warrant_units_as_of == latest_date]
+        counts = {(d.pre_funded_warrants_outstanding, d.ordinary_warrants_outstanding) for d in latest}
+        if len(counts) == 1:
+            out.warrant_units_as_of = latest_date
+            out.pre_funded_warrants_outstanding, out.ordinary_warrants_outstanding = counts.pop()
+        else:
+            out.confidence = 'low'
+            out.source += ' (conflicting outstanding warrant units)'
     return out
 
 

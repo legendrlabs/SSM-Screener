@@ -15,6 +15,9 @@ class Dilution:
     sbc_rsus_shares: float = 0.0
     atm_remaining_usd: float = 0.0
     warrant_exercise_cash_usd: float = 0.0
+    pre_funded_warrants_outstanding: Optional[float] = None
+    ordinary_warrants_outstanding: Optional[float] = None
+    warrant_units_as_of: Optional[str] = None
     source: str = ""
     confidence: str = "low"
 

@@ -138,6 +138,7 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
         return c
 
     txt = ""
+    dilution_evidence_complete = False
     try:
         if filing.get("filename"):
             txt = sec.submission_text(filing["filename"])
@@ -153,7 +154,8 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             c.event_summary = summary
         for k, v in filing_risk_flags(txt).items():
             setattr(c, k, v)
-        d, warnings = heuristic_extract_dilution(txt, common)
+        d, warnings = heuristic_extract_dilution(txt, common, event_context=True)
+        dilution_evidence_complete = not warnings
         d.atm_remaining_usd = max(d.atm_remaining_usd, extract_atm_remaining_usd(txt))
         c.dilution = apply_override(d, overrides.get(c.ticker, {}))
         c.data_warnings.extend(warnings)
@@ -174,7 +176,8 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
                 c.exhibit_review_complete = True
                 c.exhibit_documents_reviewed = [x.get("type", "") for x in exhibits]
                 for exhibit in exhibits:
-                    ex_d, ex_warnings = heuristic_extract_dilution(exhibit.get("text", ""), common)
+                    ex_d, ex_warnings = heuristic_extract_dilution(exhibit.get("text", ""), common, event_context=True)
+                    dilution_evidence_complete = dilution_evidence_complete and not ex_warnings
                     ex_d.atm_remaining_usd = max(
                         ex_d.atm_remaining_usd,
                         extract_atm_remaining_usd(exhibit.get("text", "")),
@@ -184,6 +187,7 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
                     c.data_warnings.extend(ex_warnings)
                 c.dilution = apply_override(c.dilution, overrides.get(c.ticker, {}))
             except Exception as e:
+                dilution_evidence_complete = False
                 c.data_warnings.append(f"Exhibit second-pass error: {e}")
     elif c.dilution.confidence != "high":
         c.data_warnings.append("Event filing body unavailable; dilution verification incomplete.")
@@ -199,6 +203,7 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             c.financial_review_complete = True
             c.financial_note_hits = financial_note_hits(financial_text)
             cover_common = cover_page_common_shares(financial_text)
+            common_resolved_from_cover = common <= 0 and cover_common > 0
             if common <= 0 and cover_common > 0:
                 common = cover_common
                 c.dilution.common_shares = cover_common
@@ -219,6 +224,12 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
                 extract_atm_remaining_usd(financial_text),
             )
             fin_dilution.source = f"{financial_record.get('form')} second-pass filing parser"
+            if (common_resolved_from_cover and dilution_evidence_complete
+                    and c.dilution.confidence == 'low'
+                    and overrides.get(c.ticker, {}).get('confidence') != 'low'):
+                # The cover fixes missing common shares only. Unresolved event
+                # or exhibit instruments still prevent a confidence upgrade.
+                c.dilution.confidence = 'medium'
             c.dilution = conservative_merge_dilution(c.dilution, fin_dilution)
             c.dilution = apply_override(c.dilution, overrides.get(c.ticker, {}))
             c.data_warnings.extend(fin_warnings)

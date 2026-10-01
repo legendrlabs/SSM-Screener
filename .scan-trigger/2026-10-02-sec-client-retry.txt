@@ -1,0 +1,1 @@
+Trigger live SSM scan after hardened SEC client deployment.

@@ -1,0 +1,1 @@
+Retry live scan after ASCII-normalizing SEC_USER_AGENT header.

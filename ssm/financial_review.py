@@ -53,3 +53,31 @@ def conservative_merge_dilution(current: Dilution, financial: Dilution) -> Dilut
     for field in DILUTION_FIELDS:
         setattr(out, field, max(float(getattr(current, field, 0) or 0), float(getattr(financial, field, 0) or 0)))
     return out
+
+
+def cover_page_common_shares(text: str) -> float:
+    """Fallback for issuers whose companyfacts shares tag is missing or stale."""
+    plain = re.sub(r"<[^>]+>", " ", text or "")
+    plain = re.sub(r"&nbsp;|&#160;", " ", plain, flags=re.I)
+    plain = re.sub(r"\s+", " ", plain)
+
+    class_values = {}
+    class_pattern = re.compile(
+        r"(\d[\d,]*)\s+shares\s+of\s+(Class\s+[A-Z0-9-]+)\s+common stock.{0,260}?outstanding",
+        re.I,
+    )
+    for m in class_pattern.finditer(plain):
+        value = float(m.group(1).replace(",", ""))
+        label = m.group(2).upper()
+        class_values[label] = max(class_values.get(label, 0.0), value)
+    if class_values:
+        return sum(class_values.values())
+
+    generic = []
+    generic_pattern = re.compile(
+        r"(\d[\d,]*)\s+shares\s+of\s+(?:our\s+)?common stock.{0,180}?outstanding",
+        re.I,
+    )
+    for m in generic_pattern.finditer(plain):
+        generic.append(float(m.group(1).replace(",", "")))
+    return max(generic) if generic else 0.0

@@ -53,3 +53,54 @@ def conservative_merge_dilution(current: Dilution, financial: Dilution) -> Dilut
     for field in DILUTION_FIELDS:
         setattr(out, field, max(float(getattr(current, field, 0) or 0), float(getattr(financial, field, 0) or 0)))
     return out
+
+
+def cover_page_common_shares(text: str) -> float:
+    """Fallback for issuers whose companyfacts shares tag is missing or stale."""
+    plain = re.sub(r"<[^>]+>", " ", text or "")
+    plain = re.sub(r"&nbsp;|&#160;", " ", plain, flags=re.I)
+    plain = re.sub(r"\s+", " ", plain)
+
+    class_values = {}
+    for outstanding in re.finditer(r"\boutstanding\b", plain, re.I):
+        window = plain[max(0, outstanding.start() - 420):outstanding.end()]
+        for m in re.finditer(
+            r"(\d[\d,]*)\s+shares\s+of\s+(Class\s+[A-Z0-9-]+)\s+common stock",
+            window,
+            re.I,
+        ):
+            value = float(m.group(1).replace(",", ""))
+            label = m.group(2).upper()
+            class_values[label] = max(class_values.get(label, 0.0), value)
+    if class_values:
+        return sum(class_values.values())
+
+    generic = []
+    for m in re.finditer(
+        r"(\d[\d,]*)\s+shares\s+of\s+(?:our\s+)?common stock.{0,180}?outstanding",
+        plain,
+        re.I,
+    ):
+        generic.append(float(m.group(1).replace(",", "")))
+    return max(generic) if generic else 0.0
+
+def extract_atm_remaining_usd(text: str) -> float:
+    plain = re.sub(r"<[^>]+>", " ", text or "")
+    plain = re.sub(r"&nbsp;|&#160;", " ", plain, flags=re.I)
+    plain = re.sub(r"\s+", " ", plain)
+    amount = r"\$\s*(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)?"
+    patterns = [
+        rf"{amount}.{{0,100}}?(?:remaining|remain(?:ed|s)?|available).{{0,140}}?(?:at-the-market|sales agreement)",
+        rf"(?:at-the-market|sales agreement).{{0,180}}?{amount}.{{0,100}}?(?:remaining|remain(?:ed|s)?|available)",
+    ]
+    values = []
+    for pattern in patterns:
+        for m in re.finditer(pattern, plain, re.I):
+            raw = float(m.group(1).replace(",", ""))
+            unit = (m.group(2) or "").lower()
+            if unit in ("million", "m"):
+                raw *= 1_000_000
+            elif unit in ("thousand", "k"):
+                raw *= 1_000
+            values.append(raw)
+    return max(values) if values else 0.0

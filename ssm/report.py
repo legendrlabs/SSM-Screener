@@ -24,7 +24,7 @@ def write_outputs(candidates,cfg,out_dir):
         fields=["ticker","event_date","form","event_type","event_proof","accession","summary","gate_status","bucket"];w=csv.DictWriter(f,fieldnames=fields);w.writeheader()
         for c in candidates:w.writerow({"ticker":c.ticker,"event_date":c.latest_event_date,"form":c.latest_event_form,"event_type":c.event_type,"event_proof":c.event_proof,"accession":c.latest_event_accession,"summary":c.event_summary,"gate_status":c.gate_status,"bucket":c.bucket})
     safe=all(c.gate_status!="DATA_HOLD" for c in candidates if c.bucket=="A_RESEARCH_NOW")
-    q={"SAFE_TO_ACT":safe,"candidate_count":len(candidates),"data_hold_count":sum(c.gate_status=="DATA_HOLD" for c in candidates),"pass_count":sum(c.gate_status=="PASS" for c in candidates),"watch_count":sum(c.gate_status=="WATCH" for c in candidates),"reject_count":sum(c.gate_status=="REJECT" for c in candidates)}
+    q={"SAFE_TO_ACT":safe,"sec_discovery_mode":cfg.get("_sec_discovery_mode","unknown"),"candidate_count":len(candidates),"data_hold_count":sum(c.gate_status=="DATA_HOLD" for c in candidates),"pass_count":sum(c.gate_status=="PASS" for c in candidates),"watch_count":sum(c.gate_status=="WATCH" for c in candidates),"reject_count":sum(c.gate_status=="REJECT" for c in candidates)}
     (out/"quality.json").write_text(json.dumps(q,indent=2),encoding="utf-8")
     top=[c for c in candidates if c.bucket=="A_RESEARCH_NOW"][:cfg["max_candidates"]]; watch=[c for c in candidates if c.bucket in ("B_WATCH","C_SPECULATIVE")][:10]; reject=[c for c in candidates if c.bucket=="REJECT"][:10]; hold=[c for c in candidates if c.bucket=="DATA_HOLD"][:10]
     md=["# Special Situation Microcap — latest","",f"**SAFE_TO_ACT: {'TRUE' if safe else 'FALSE'}**",""]

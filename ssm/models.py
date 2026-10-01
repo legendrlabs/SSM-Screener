@@ -49,6 +49,8 @@ class Candidate:
     latest_financial_accession: Optional[str] = None
     financial_review_complete: bool = False
     financial_note_hits: List[str] = field(default_factory=list)
+    common_shares_source: str = ""
+    share_count_conflict: bool = False
     latest_event_date: Optional[str] = None
     latest_event_form: Optional[str] = None
     latest_event_accession: Optional[str] = None

@@ -38,3 +38,11 @@ jobs:
           probe "latest_8k_atom" "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&count=10&output=atom"
           sleep 1
           probe "daily_index" "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/master.20261001.idx"
+          sleep 1
+          curl -L -sS -A "$UA" -o /tmp/latest8k.xml "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&count=10&output=atom"
+          first_href=$(grep -o 'href="[^"]*"' /tmp/latest8k.xml | sed 's/^href="//;s/"$//' | grep '/Archives/edgar/data/' | head -1 || true)
+          if [ -n "$first_href" ]; then
+            probe "atom_first_filing" "$first_href"
+          else
+            echo "atom_first_filing|NO_LINK|0|"
+          fi

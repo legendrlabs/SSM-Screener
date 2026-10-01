@@ -1,6 +1,11 @@
 name: SSM Daily Scan
+
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".scan-trigger/**"
   schedule:
     - cron: "30 11 * * 1-5"
     - cron: "30 22 * * 1-5"
@@ -18,7 +23,7 @@ jobs:
       - run: pip install -e .
       - name: Run screener
         env:
-          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT || 'SSM-Screener/0.1 whtjddlfcjswo1-cloud@users.noreply.github.com' }}
           SSM_MARKET_PROVIDER: yfinance
         run: ssm scan --days 7 --out output
       - name: Commit outputs

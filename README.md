@@ -95,3 +95,24 @@ SEC filing의 warrant / convert / preferred 구조는 표준 XBRL 태그가 없�
 - reverse split / Nasdaq deficiency history
 - 13D/G / Form 4 strategic validation
 - thesis diff / position tracker
+
+
+## 10-Q / 10-K second pass
+
+신규 후보 발견은 8-K / S-1 / S-3 / 424B / 13D/G / Proxy 등 이벤트성 filing에서 시작합니다.
+
+후보가 잡히면 최신 10-Q 또는 10-K primary document를 별도로 다시 읽어 다음 항목을 2차 검증합니다.
+
+- warrants / pre-funded warrants
+- convertible notes / preferred
+- ATM / equity line
+- stock-based compensation / RSUs
+- going concern
+- related-party transactions
+- subsequent events
+- debt / commitments / contingencies
+- stockholders' equity
+
+이 2차 검토가 완료되지 않으면 해당 후보는 `DATA_HOLD`를 유지합니다.
+
+이벤트 filing과 10-Q/K에 같은 증권이 반복 기재되는 경우 share equivalents는 단순 합산하지 않고 보수적으로 각 항목의 최대값을 사용해 중복계산을 피합니다.

@@ -60,6 +60,14 @@ Always attempt to produce:
 
 If cap-table confidence is low, do not guess; emit `DATA_HOLD`.
 
+## SEC discovery modes
+
+- `atom`: use on GitHub-hosted/public environments; discover filings via the official SEC Atom feed, then verify with submissions/companyfacts and the primary filing document.
+- `daily-index`: use on local/self-hosted environments when EDGAR master-index access is available.
+- `auto`: try daily-index first and fall back to Atom on HTTP 403.
+
+The evidence standard is unchanged. If filing text or dilution terms cannot be verified, keep the candidate at `DATA_HOLD`.
+
 ## Runtime output order
 
 When generated output files exist, read:

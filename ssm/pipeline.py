@@ -8,7 +8,7 @@ from .gates import evaluate_gates
 from .scoring import score_candidate, bucket_candidate
 from .providers.sec import SecClient, latest_fact_value, filing_risk_flags
 from .providers.market import market_snapshot, market_snapshots
-from .financial_review import financial_note_hits, conservative_merge_dilution
+from .financial_review import financial_note_hits, conservative_merge_dilution, cover_page_common_shares
 
 OFFERING_FORMS = {"S-1", "S-3", "424B3", "424B5"}
 OWNERSHIP_FORMS = {"SC 13D", "SC 13D/A", "SC 13G", "SC 13G/A"}
@@ -167,6 +167,17 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             financial_text = sec.submission_text(financial_record["filename"])
             c.financial_review_complete = True
             c.financial_note_hits = financial_note_hits(financial_text)
+            cover_common = cover_page_common_shares(financial_text)
+            if common <= 0 and cover_common > 0:
+                common = cover_common
+                c.dilution.common_shares = cover_common
+                c.data_warnings.append("Common shares resolved from latest 10-Q/10-K cover page.")
+            elif common > 0 and cover_common > 0:
+                ratio = cover_common / common
+                if ratio < 0.8 or ratio > 1.25:
+                    c.data_warnings.append(
+                        f"Companyfacts vs cover-page shares differ materially ({common:.0f} vs {cover_common:.0f})."
+                    )
             for k, v in filing_risk_flags(financial_text).items():
                 setattr(c, k, bool(getattr(c, k)) or bool(v))
             fin_dilution, fin_warnings = heuristic_extract_dilution(financial_text, common)

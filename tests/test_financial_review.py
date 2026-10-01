@@ -1,5 +1,5 @@
 from ssm.models import Dilution
-from ssm.financial_review import financial_note_hits, conservative_merge_dilution
+from ssm.financial_review import financial_note_hits, conservative_merge_dilution, cover_page_common_shares, extract_atm_remaining_usd
 
 def test_financial_note_hits():
     text = """
@@ -31,3 +31,17 @@ def test_conservative_merge_uses_max_not_sum():
     assert merged.warrants_itm_shares == 3_000_000
     assert merged.converts_shares == 1_000_000
     assert merged.strict_fd_shares == 18_000_000
+
+
+def test_cover_page_common_shares_generic():
+    text="As of August 10, 2026, there were 12,345,678 shares of common stock outstanding."
+    assert cover_page_common_shares(text)==12_345_678
+
+def test_cover_page_common_shares_sums_classes():
+    text="As of August 10, 2026, 10,000,000 shares of Class A common stock and 2,000,000 shares of Class B common stock were outstanding."
+    assert cover_page_common_shares(text)==12_000_000
+
+
+def test_extract_atm_remaining_usd():
+    text="Approximately $50.0 million remained available under the at-the-market sales agreement."
+    assert extract_atm_remaining_usd(text)==50_000_000

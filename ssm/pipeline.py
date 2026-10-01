@@ -8,6 +8,7 @@ from .gates import evaluate_gates
 from .scoring import score_candidate, bucket_candidate
 from .providers.sec import SecClient, latest_fact_value, filing_risk_flags
 from .providers.market import market_snapshot, market_snapshots
+from .financial_review import financial_note_hits, conservative_merge_dilution
 
 OFFERING_FORMS = {"S-1", "S-3", "424B3", "424B5"}
 OWNERSHIP_FORMS = {"SC 13D", "SC 13D/A", "SC 13G", "SC 13G/A"}
@@ -110,8 +111,13 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
         except Exception as e:
             c.data_warnings.append(f"Market data error: {e}")
 
+    financial_record = None
     try:
-        c.latest_financial_filing_date = sec.latest_financial_filing(meta["cik"])
+        financial_record = sec.latest_financial_record(meta["cik"])
+        if financial_record:
+            c.latest_financial_filing_date = financial_record.get("filed")
+            c.latest_financial_form = financial_record.get("form")
+            c.latest_financial_accession = financial_record.get("accession")
         common = _common_shares(sec.companyfacts(meta["cik"]))
     except Exception as e:
         common = 0.0
@@ -149,7 +155,29 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
         c.dilution = apply_override(d, overrides.get(c.ticker, {}))
         c.data_warnings.extend(warnings)
     elif c.dilution.confidence != "high":
-        c.data_warnings.append("Filing body unavailable; dilution verification incomplete.")
+        c.data_warnings.append("Event filing body unavailable; dilution verification incomplete.")
+
+    # Mandatory second pass: read the latest 10-Q/10-K body for notes that often
+    # contain warrants, converts, preferreds, SBC, related-party items, liquidity
+    # language and subsequent events. Event discovery and financial validation are
+    # deliberately separate stages.
+    financial_text = ""
+    if financial_record and financial_record.get("filename"):
+        try:
+            financial_text = sec.submission_text(financial_record["filename"])
+            c.financial_review_complete = True
+            c.financial_note_hits = financial_note_hits(financial_text)
+            for k, v in filing_risk_flags(financial_text).items():
+                setattr(c, k, bool(getattr(c, k)) or bool(v))
+            fin_dilution, fin_warnings = heuristic_extract_dilution(financial_text, common)
+            fin_dilution.source = f"{financial_record.get('form')} second-pass filing parser"
+            c.dilution = conservative_merge_dilution(c.dilution, fin_dilution)
+            c.dilution = apply_override(c.dilution, overrides.get(c.ticker, {}))
+            c.data_warnings.extend(fin_warnings)
+        except Exception as e:
+            c.data_warnings.append(f"Financial filing second-pass error: {e}")
+    else:
+        c.data_warnings.append("Latest 10-Q/10-K primary document unavailable.")
 
     c.gate_status, reasons = evaluate_gates(c, cfg)
     c.data_warnings.extend(reasons)

@@ -7,29 +7,24 @@
 
 ## B/C — WATCH
 
-- **BLMN** — B_WATCH, score 61. Material dilution language found but no reliable share quantity extracted.; Above preferred microcap range; retained as expanded-universe candidate.
-- **INGN** — B_WATCH, score 59. Material dilution language found but no reliable share quantity extracted.
-- **ELME** — B_WATCH, score 59. Material dilution language found but no reliable share quantity extracted.
-- **NSTS** — B_WATCH, score 57. Material dilution language found but no reliable share quantity extracted.
-- **BSEM** — B_WATCH, score 57. Material dilution language found but no reliable share quantity extracted.
-- **INSG** — B_WATCH, score 54. 
-- **IIPR-PA** — B_WATCH, score 53. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
-- **CNTY** — B_WATCH, score 53. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
-- **SXC** — B_WATCH, score 52. Material dilution language found but no reliable share quantity extracted.; Above preferred microcap range; retained as expanded-universe candidate.
-- **UTL** — B_WATCH, score 52. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
+- **INGN** — B_WATCH, score 59. 
+- **AMCI** — B_WATCH, score 47. 
+- **ZCSH** — C_SPECULATIVE, score 38. 
+- **ROC** — C_SPECULATIVE, score 31. Liquidity only qualifies for WATCH.
+- **LFCR** — C_SPECULATIVE, score 27. 
 
 ## DATA HOLD
 
-- **BBGI** — DATA_HOLD, score 57. Common shares outstanding not resolved.
-- **MSGS** — DATA_HOLD, score 56. Material dilution language found but no reliable share quantity extracted.; Common shares outstanding not resolved.
-- **LOVIU** — DATA_HOLD, score 56. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Latest 10-Q/10-K primary document unavailable.
-- **BRRKU** — DATA_HOLD, score 56. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
-- **FOXF** — DATA_HOLD, score 56. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
-- **LXEO** — DATA_HOLD, score 51. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Cap table confidence is low.
-- **FLWS** — DATA_HOLD, score 50. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
-- **HRL** — DATA_HOLD, score 47. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
-- **AMCI** — DATA_HOLD, score 47. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Cap table confidence is low.
-- **HVIIU** — DATA_HOLD, score 43. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
+- **BLMN** — DATA_HOLD, score 61. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Unresolved share quantity for preferred shares.
+- **ELME** — DATA_HOLD, score 59. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Cap table confidence is low.
+- **NSTS** — DATA_HOLD, score 57. Material dilution language found but no reliable share quantity extracted.; Cap table confidence is low.
+- **BBGI** — DATA_HOLD, score 57. Unresolved share quantity for ordinary warrants.; Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.
+- **BSEM** — DATA_HOLD, score 57. Unresolved share quantity for pre-funded warrants.; Unresolved share quantity for convertible debt.; Unresolved share quantity for preferred shares.
+- **MSGS** — DATA_HOLD, score 56. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Unresolved share quantity for preferred shares.
+- **LOVIU** — DATA_HOLD, score 56. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Material dilution language found but no reliable share quantity extracted.
+- **BRRKU** — DATA_HOLD, score 56. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Material dilution language found but no reliable share quantity extracted.
+- **FOXF** — DATA_HOLD, score 56. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.
+- **INSG** — DATA_HOLD, score 54. Unresolved share quantity for convertible debt.; Unresolved share quantity for preferred shares.; Cap table confidence is low.
 
 ## REJECT
 
@@ -39,7 +34,7 @@
 - **DBRG-PJ** — REJECT, score 59. Market cap above expanded universe ceiling; filing body skipped.
 - **DK** — REJECT, score 52. Market cap above expanded universe ceiling; filing body skipped.
 - **TE** — REJECT, score 52. Market cap above expanded universe ceiling; filing body skipped.
-- **KLXER** — REJECT, score 44. Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.; Material dilution language found but no reliable share quantity extracted.
 - **CPK** — REJECT, score 34. Market cap above expanded universe ceiling; filing body skipped.
 - **TTMI** — REJECT, score 34. Market cap above expanded universe ceiling; filing body skipped.
 - **TTWO** — REJECT, score 34. Market cap above expanded universe ceiling; filing body skipped.
+- **BMRN** — REJECT, score 34. Market cap above expanded universe ceiling; filing body skipped.

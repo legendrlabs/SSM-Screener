@@ -3,8 +3,11 @@
   "sec_discovery_mode": "atom",
   "candidate_count": 271,
   "financial_review_incomplete_count": 76,
-  "data_hold_count": 73,
-  "pass_count": 38,
-  "watch_count": 80,
-  "reject_count": 80
+  "data_hold_count": 196,
+  "pass_count": 4,
+  "watch_count": 5,
+  "reject_count": 66,
+  "source_commit": "0aa6236c732622a3895cac845443372a35f156bc",
+  "workflow_run_id": "36906332704",
+  "generated_at": "2026-10-01T18:36:33.259545+00:00"
 }

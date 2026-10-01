@@ -8,7 +8,7 @@ from .gates import evaluate_gates
 from .scoring import score_candidate, bucket_candidate
 from .providers.sec import SecClient, latest_fact_value, filing_risk_flags
 from .providers.market import market_snapshot, market_snapshots
-from .financial_review import financial_note_hits, conservative_merge_dilution, cover_page_common_shares
+from .financial_review import financial_note_hits, conservative_merge_dilution, cover_page_common_shares, extract_atm_remaining_usd
 
 OFFERING_FORMS = {"S-1", "S-3", "424B3", "424B5"}
 OWNERSHIP_FORMS = {"SC 13D", "SC 13D/A", "SC 13G", "SC 13G/A"}

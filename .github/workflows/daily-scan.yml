@@ -11,7 +11,7 @@ on:
     - cron: "30 22 * * 1-5"
 
 concurrency:
-  group: ssm-daily-scan
+  group: ssm-daily-scan-v2
   cancel-in-progress: true
 
 jobs:

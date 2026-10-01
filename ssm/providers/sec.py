@@ -1,5 +1,5 @@
 from __future__ import annotations
-import os, re, time, datetime as dt
+import os, re, time, datetime as dt, html
 import urllib.parse
 import xml.etree.ElementTree as ET
 import requests
@@ -203,6 +203,61 @@ class SecClient:
         if filename_or_url.startswith("http://") or filename_or_url.startswith("https://"):
             return self._get(filename_or_url).text
         return self._get(f"{SEC_BASE}/Archives/{filename_or_url.lstrip('/')}").text
+
+    def filing_index_url(self, cik, accession, index_url=None):
+        if index_url:
+            return index_url
+        acc = str(accession or "")
+        if not acc:
+            return ""
+        return (
+            f"{SEC_BASE}/Archives/edgar/data/{int(cik)}/"
+            f"{acc.replace('-', '')}/{acc}-index.htm"
+        )
+
+    def filing_documents(self, cik, accession, index_url=None):
+        url = self.filing_index_url(cik, accession, index_url=index_url)
+        if not url:
+            return []
+        page = self._get(url).text
+        docs = []
+        seen = set()
+        for row in re.findall(r"<tr\b[^>]*>(.*?)</tr>", page, re.I | re.S):
+            plain = html.unescape(re.sub(r"<[^>]+>", " ", row))
+            plain = re.sub(r"\s+", " ", plain).strip()
+            type_m = re.search(r"\b(EX-(?:2|4|10|99)(?:\.\d+)?)\b", plain, re.I)
+            if not type_m:
+                continue
+            href_m = re.search(r'href=["\']([^"\']+)["\']', row, re.I)
+            if not href_m:
+                continue
+            href = urllib.parse.urljoin(url, html.unescape(href_m.group(1)))
+            if href in seen:
+                continue
+            if re.search(r"\.(?:xml|xsd|jpg|jpeg|gif|png)$", href, re.I):
+                continue
+            seen.add(href)
+            docs.append({
+                "type": type_m.group(1).upper(),
+                "url": href,
+                "description": plain[:300],
+            })
+        priority = {"EX-2": 0, "EX-4": 1, "EX-10": 2, "EX-99": 3}
+        docs.sort(key=lambda d: (
+            min((rank for prefix, rank in priority.items() if d["type"].startswith(prefix)), default=9),
+            d["type"],
+        ))
+        return docs
+
+    def relevant_exhibit_texts(self, cik, accession, index_url=None, max_docs=6):
+        out = []
+        for doc in self.filing_documents(cik, accession, index_url=index_url)[:max_docs]:
+            try:
+                text = self._get(doc["url"]).text
+            except requests.RequestException:
+                continue
+            out.append({**doc, "text": text})
+        return out
 
     def submissions(self, cik):
         key = str(int(cik))

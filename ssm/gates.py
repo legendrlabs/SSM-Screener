@@ -12,6 +12,7 @@ def evaluate_gates(c: Candidate, cfg):
     if c.exchange not in cfg["exchanges"]: return "REJECT", [f"Exchange {c.exchange!r} outside allowed universe."]
     if c.price is None or c.price <= 0: return "DATA_HOLD", ["Missing/stale market price."]
     if c.dilution.common_shares <= 0: return "DATA_HOLD", ["Common shares outstanding not resolved."]
+    if c.share_count_conflict: return "DATA_HOLD", ["Companyfacts and cover-page share counts materially conflict."]
     if c.dilution.confidence == "low": return "DATA_HOLD", ["Cap table confidence is low."]
     mc=c.basic_market_cap()
     if mc is None: return "DATA_HOLD", ["Basic market cap unavailable."]

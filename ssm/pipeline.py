@@ -157,6 +157,34 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
         d.atm_remaining_usd = max(d.atm_remaining_usd, extract_atm_remaining_usd(txt))
         c.dilution = apply_override(d, overrides.get(c.ticker, {}))
         c.data_warnings.extend(warnings)
+
+        # Targeted exhibit second pass. Many microcap financing terms live in
+        # EX-4 / EX-10 / EX-99 rather than the 8-K body. Only follow exhibits
+        # when the primary event filing signals dilution but does not resolve it,
+        # or when the event itself is an offering filing.
+        needs_exhibits = bool(warnings) or filing.get("form") in OFFERING_FORMS
+        if needs_exhibits and filing.get("accession"):
+            try:
+                exhibits = sec.relevant_exhibit_texts(
+                    meta["cik"],
+                    filing.get("accession"),
+                    index_url=filing.get("index_url"),
+                    max_docs=6,
+                )
+                c.exhibit_review_complete = True
+                c.exhibit_documents_reviewed = [x.get("type", "") for x in exhibits]
+                for exhibit in exhibits:
+                    ex_d, ex_warnings = heuristic_extract_dilution(exhibit.get("text", ""), common)
+                    ex_d.atm_remaining_usd = max(
+                        ex_d.atm_remaining_usd,
+                        extract_atm_remaining_usd(exhibit.get("text", "")),
+                    )
+                    ex_d.source = f"{exhibit.get('type', 'EX')} exhibit parser"
+                    c.dilution = conservative_merge_dilution(c.dilution, ex_d)
+                    c.data_warnings.extend(ex_warnings)
+                c.dilution = apply_override(c.dilution, overrides.get(c.ticker, {}))
+            except Exception as e:
+                c.data_warnings.append(f"Exhibit second-pass error: {e}")
     elif c.dilution.confidence != "high":
         c.data_warnings.append("Event filing body unavailable; dilution verification incomplete.")
 

@@ -3,8 +3,8 @@
   "sec_discovery_mode": "atom",
   "candidate_count": 271,
   "financial_review_incomplete_count": 76,
-  "data_hold_count": 84,
-  "pass_count": 32,
-  "watch_count": 76,
-  "reject_count": 79
+  "data_hold_count": 73,
+  "pass_count": 38,
+  "watch_count": 80,
+  "reject_count": 80
 }

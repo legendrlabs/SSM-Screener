@@ -10,29 +10,29 @@ NSTS,5253131.0,5253131.0,5253131.0,1.0,0.0,0.0,medium,heuristic filing-text pars
 BBGI,0.0,161213.0,161213.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
 BSEM,17849471.0,18584767.0,18584767.0,1.0411942740487938,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 MSGS,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-K second-pass filing parser
-LOVIU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser
-BRRKU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser
-FOXF,42031001.0,42031001.0,42031001.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+LOVIU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-99.1 exhibit parser
+BRRKU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-4.1 exhibit parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + EX-10.4 exhibit parser + EX-10.5 exhibit parser
+FOXF,42031001.0,42031001.0,42031001.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 INSG,16420592.0,16941731.0,16941731.0,1.0317369191074233,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-IIPR-PA,27571349.0,27571349.0,27571349.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-CNTY,28137692.0,28137692.0,28137692.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+IIPR-PA,27571349.0,27571349.0,27571349.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + EX-10.4 exhibit parser + EX-99.1 exhibit parser + EX-99.2 exhibit parser + 10-Q second-pass filing parser
+CNTY,28137692.0,28137692.0,28137692.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-2.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 SXC,84874850.0,84874850.0,84874850.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 DK,61232174.0,61232174.0,61232174.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
-UTL,18236674.0,18236674.0,18236674.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+UTL,18236674.0,18236674.0,18236674.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-4.1 exhibit parser + EX-4.2 exhibit parser + EX-4.3 exhibit parser + 10-Q second-pass filing parser
 TE,294527066.0,294527066.0,294527066.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 LXEO,82046255.0,82046255.0,82046255.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-FLWS,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-K second-pass filing parser
-CSV,15882296.0,15882296.0,15882296.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-HRL,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
+FLWS,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-99.1 exhibit parser + 10-K second-pass filing parser
+CSV,15882296.0,15882296.0,15882296.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + EX-99.2 exhibit parser + 10-Q second-pass filing parser
+HRL,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-99.1 exhibit parser + EX-99.2 exhibit parser + 10-Q second-pass filing parser
 AMCI,22600363.0,22600363.0,22600363.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-AGPU,11591124.0,11591124.0,11591124.0,1.0,83000000.0,0.6292312368024355,low,heuristic filing-text parser + 10-Q second-pass filing parser
+AGPU,11591124.0,11591124.0,11591124.0,1.0,83000000.0,0.6260952500532762,medium,heuristic filing-text parser + EX-2.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 HSDT,60458703.0,64828059.0,64828059.0,1.0722700915366974,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-SSTI,13163790.0,13163790.0,13163790.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-KLXER,21273059.0,22076771.0,22076771.0,1.0377807441797628,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-HVIIU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
+SSTI,13163790.0,16229234.0,16229234.0,1.2328694091899066,0.0,0.0,medium,heuristic filing-text parser + EX-2.1 exhibit parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.4 exhibit parser + EX-10.5 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+KLXER,21273059.0,22076771.0,22076771.0,1.0377807441797628,0.0,0.0,medium,heuristic filing-text parser + EX-4.1 exhibit parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+HVIIU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-2.5 exhibit parser + EX-10.1 exhibit parser + EX-10.10 exhibit parser + EX-10.11 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + 10-Q second-pass filing parser
 FNGR,61310361.0,64310361.0,64310361.0,1.048931370669959,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-JELD,86763382.0,86763382.0,86763382.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-IPHXU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
+JELD,86763382.0,86763382.0,86763382.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-99.1 exhibit parser + EX-99.2 exhibit parser + 10-Q second-pass filing parser
+IPHXU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 FVR,24455953.0,24455953.0,24455953.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 GREEL,18429902.0,20184288.0,21938674.0,1.1903847345471505,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 VIP,18429902.0,20184288.0,21938674.0,1.1903847345471505,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
@@ -41,32 +41,32 @@ BSAAU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass fili
 FEMY,8375027.0,12736467.0,12736467.0,1.520767276332363,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 JYNT,14143154.0,14143154.0,14143154.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 SGMT,30674855.0,33424865.0,33424865.0,1.0896503015254677,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+VTIX,0.0,230000.0,230000.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
 VRME,13165196.0,14627092.0,14627092.0,1.1110424789725881,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-TOPP,24700000.0,24700000.0,24700000.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+TOPP,24700000.0,24700000.0,24700000.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-2.1 exhibit parser + 10-Q second-pass filing parser
 ZCSH,4829300.0,4829300.0,4829300.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 ATER,17966910.0,17983577.0,17983584.7,1.0009280783395698,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-PYXS,83408050.0,85291171.0,85291171.0,1.0225772092741647,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 NCI,20320000.0,20320000.0,20320000.0,1.0,0.0,0.0,low,heuristic filing-text parser
 SWRD,211149963.0,215267608.0,215267608.0,1.019501045330517,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-AIB,75979466.0,75979466.0,75979466.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-LAB,392578808.0,392578808.0,392578808.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-FINS,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser
+AIB,75979466.0,75979466.0,75979466.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+LAB,392578808.0,392578808.0,392578808.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-2.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+FINS,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-99.2 exhibit parser
 NMAD,16101068.0,16101068.0,16101068.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-DMRC,22475329.0,22475329.0,22475329.0,1.0,300000.0,0.0020378578388696683,low,heuristic filing-text parser + 10-Q second-pass filing parser
-EZRA,1002998.0,1002998.0,1002998.0,1.0,1117000.0,0.4902325527005827,low,heuristic filing-text parser + 10-Q second-pass filing parser
+DMRC,22475329.0,22475329.0,22475329.0,1.0,300000.0,0.0020254884558758503,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+EZRA,1002998.0,1002998.0,1002998.0,1.0,1117000.0,0.4863149616345658,medium,heuristic filing-text parser + EX-2.1 exhibit parser + EX-2.2 exhibit parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
 UNCY,27855257.0,27855257.0,27855257.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-LRHC,3317834.0,3317834.0,3317834.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+LRHC,3317834.0,3317834.0,3317834.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-10.10 exhibit parser + EX-10.11 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + EX-10.4 exhibit parser + 10-Q second-pass filing parser
 GLUE,85313401.0,86688401.0,86688401.0,1.0161170459023197,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 CPK,24106455.0,24106455.0,24106455.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 TTMI,105348864.0,105348864.0,105348864.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 TTWO,186980443.0,186980443.0,186980443.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
-PLCE,22237067.0,22237067.0,22237067.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+PLCE,22237067.0,22237067.0,22237067.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-4.1 exhibit parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + 10-Q second-pass filing parser
 BMRN,193573759.0,193573759.0,193573759.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 BHRB,20187033.0,20187033.0,20187033.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 FANG,280024353.0,280024353.0,280024353.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 SON,98868689.0,98868689.0,98868689.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 SNX,79958752.0,79958752.0,79958752.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
-ALMU,19265671.0,19579572.0,19579572.0,1.0162932814538357,50000000.0,0.2059753770379238,medium,heuristic filing-text parser + 10-K second-pass filing parser
+ALMU,19265671.0,19579572.0,19579572.0,1.0162932814538357,50000000.0,0.20451457171544052,medium,heuristic filing-text parser + 10-K second-pass filing parser
 RENT,33774121.0,33774121.0,33774121.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 PSIX,23065450.0,23065450.0,23065450.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 PEBO,35942315.0,35942315.0,35942315.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
@@ -82,9 +82,10 @@ JEF,204432307.0,204432307.0,204432307.0,1.0,0.0,0.0,low,SEC companyfacts metadat
 KR,590588700.0,590588700.0,590588700.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 CPSS,21554714.0,21554714.0,21554714.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 SMTI,9188035.0,9188035.0,9188035.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-CVKD,3567592.0,4527592.0,4527592.0,1.2690890662385161,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+CVKD,3567592.0,5487592.0,5487592.0,1.538178132477032,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+PYXS,83408050.0,104891324.0,104891324.0,1.2575683522154038,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 CRMT,8338478.0,8338478.0,8338478.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-VERI,100457068.0,100457068.0,100457095.2068,1.000000270830122,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+VERI,100457068.0,100457068.0,100457095.2068,1.000000270830122,0.0,0.0,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 INDP,133242324.0,133508454.0,133508454.0,1.0019973383232192,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 PBI-PB,137090212.0,137090212.0,137090212.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 TGL,1675725.0,1675725.0,1675725.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
@@ -92,54 +93,54 @@ C-PR,1749319009.0,1749319009.0,1749319009.0,1.0,0.0,0.0,low,SEC companyfacts met
 SEV,28560115.0,28770115.0,28770115.0,1.0073529115691586,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 ROC,19080127.0,19080127.0,19080127.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 LTRN,12784146.0,17135619.0,17135619.0,1.340380421187305,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-GIPR,1861303.0,1861303.0,2915233.0,1.5662323651764383,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-OCLTW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser
-HAVAU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
+OCLTW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + EX-99.1 exhibit parser
+HAVAU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + EX-10.4 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 GOAI,39252186.0,39252186.0,39252186.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 ATOS,9979298.0,11342935.0,11342935.0,1.1366465857618442,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-IMMX,71539314.0,74966219.0,74966219.0,1.0479024023070727,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-MLTX,85106685.0,85106685.0,85106685.0,1.0,213800000.0,0.21637736083777742,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-LESL,9365475.0,9365475.0,9365475.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+IMMX,71539314.0,74966219.0,74966219.0,1.0479024023070727,0.0,0.0,medium,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+MLTX,85106685.0,85106685.0,85106685.0,1.0,213800000.0,0.217501389052314,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+LESL,9365475.0,9365475.0,9365475.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + EX-99.2 exhibit parser + 10-Q second-pass filing parser
 TECX,19549366.0,19549366.0,19549366.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 CAC,16897049.0,16897049.0,16897049.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 NRUC,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-K second-pass filing parser
-RCT,59362026.0,59362026.0,59362026.0,1.0,6700000.0,0.5878477434379809,low,heuristic filing-text parser
-EL,8646747.0,9442380.0,9442380.0,1.0920152977761464,0.0,0.0,medium,heuristic filing-text parser + 10-K second-pass filing parser
+RCT,59362026.0,59362026.0,59362026.0,1.0,6700000.0,0.5940356270392652,low,heuristic filing-text parser
+EL,0.0,795633.0,795633.0,,0.0,,low,heuristic filing-text parser + 10-K second-pass filing parser
 VHC,4216633.0,4216633.0,4216633.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 CIVB,20794238.0,20794238.0,20794238.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 AIXC,20234993.0,21234993.0,21234993.0,1.0494193400511678,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 LFCR,37853060.0,37853060.0,37853060.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-RNAC,30255352.0,30255352.0,30255352.0,1.0,19300000.0,0.0867896157416012,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-KITTW,7471960.0,7471960.0,7471960.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+RNAC,30255352.0,30255352.0,30255352.0,1.0,19300000.0,0.08649541253204963,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+KITTW,7471960.0,7471960.0,7471960.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
+DJTWW,277941274.0,277941274.0,277941274.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 CTKB,129983253.0,129983253.0,129983253.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 BHR-PD,68679318.0,68679318.0,68679318.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
-OBAI,29975526.0,29975526.0,29975526.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+OBAI,29975526.0,31008861.0,31008861.0,1.0344726227656522,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+PARAW,0.0,294917.0,294917.0,,0.0,,low,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
+VAL-WT,69435807.0,69435807.0,69435807.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 AIFA,6420316.0,6420316.0,6420316.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 WLFC,21144111.0,21144111.0,21144111.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 QTTB,29769466.0,34700972.0,34700972.0,1.1656565153032976,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 FDS,35565543.0,35565543.0,35565543.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
-ATXG,1177974.0,1177974.0,1177974.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+ATXG,1177974.0,1177974.0,1177974.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
 AFCG,22671919.0,22671919.0,22671919.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-FTW-WT,1600000000.0,1609741373.0,1609741473.0,1.006088420625,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+FTW-WT,31325815.0,32484147.0,32484247.0,1.0369801073012785,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 MEGL,20256099.0,20256099.0,20256099.0,1.0,0.0,0.0,low,heuristic filing-text parser
 BXBL,10295800.0,10295800.0,10295800.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 RSSS,33762669.0,33762669.0,33762669.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-K second-pass filing parser
 BAM,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
 CTNT,36177712.0,36177712.0,36177712.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-VTIX,93333.0,323333.0,323333.0,3.4642945153375546,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 ARI,128212093.0,128212093.0,128212093.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 GENK,32964618.0,32964618.0,32964618.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 ALDX,60326421.0,60326421.0,60326421.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 AEHL,4580547.0,4580547.0,4580547.0,1.0,0.0,0.0,low,heuristic filing-text parser
 IPDN,14450323.0,19974323.0,19974323.0,1.3822751920493404,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 BCDA,15138782.0,15545600.0,15545600.0,1.0268725713865223,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-OBIO,60105049.0,60105049.0,60105049.0,1.0,5900000.0,0.01521883310036494,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-VWAVW,28842069.0,30650421.0,30650421.0,1.0626984145970944,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-NTWOW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
+OBIO,60105049.0,60105049.0,60105049.0,1.0,5900000.0,0.015301866122885687,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+VWAVW,28842069.0,30650421.0,30650421.0,1.0626984145970944,0.0,0.0,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + 10-Q second-pass filing parser
+NTWOW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 BRID,9076832.0,9076832.0,9076832.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-DJTWW,277941274.0,277941274.0,277941274.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
-SZZLU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
-SPKLW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
+SZZLU,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-2.1 exhibit parser + 10-Q second-pass filing parser
+SPKLW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 HRTX,189852307.0,189852307.0,189852307.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 WHLRL,1931568.0,1931568.0,1931569.8,1.0000009318853906,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 TONT-WT,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
@@ -148,11 +149,12 @@ ONCY,127510505.0,127510505.0,127510505.0,1.0,0.0,0.0,medium,heuristic filing-tex
 COLAU,4494439.0,4494439.0,4494439.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 VYLD,2658186195.0,2658186195.0,2658186195.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 UWMC,103104205.0,433104205.0,433104205.0,4.200645405296515,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+GPRO,0.0,11076968.0,26576968.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
 ALLR,15910724.0,15910724.0,15910724.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 VBIO,22189739.0,22626751.0,22626751.0,1.0196943280856074,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-VAL-WT,69435807.0,69435807.0,69435807.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 SCWO,17718161.0,17843161.0,18303161.0,1.0330169705535468,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 TRUG,914267.0,914267.0,914267.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+GIPR,1861303.0,3636303.0,4690233.0,2.5198653846257164,0.0,0.0,medium,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 OSBC,50875716.0,50875716.0,50875716.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 MTX,31128762.0,31128762.0,31128762.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 CTVA,667196000.0,667196000.0,667196000.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
@@ -189,29 +191,29 @@ SHMDW,43062427.0,43062427.0,43062427.0,1.0,0.0,0.0,low,heuristic filing-text par
 HRB,123265922.0,123265922.0,123265922.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 BR,114021798.0,114021798.0,114021798.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 ZONE,508830259.0,684255679.0,684255679.0,1.3447621616386616,0.0,0.0,medium,heuristic filing-text parser + 10-K second-pass filing parser
-BZFDW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
+BZFDW,33355.0,33355.0,33355.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
 XRPNW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
 CBNK,16290456.0,16290456.0,16290456.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 BNED,34664980.0,34664980.0,34664980.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 ENSC,19456794.0,20012622.0,20678544.0,1.062792976067897,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 AOSL,30259255.0,30259255.0,30259255.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-K second-pass filing parser
 CTA-PA,100.0,100.0,100.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-MAMO,41640950.0,41640950.0,41640950.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+MAMO,41640950.0,41640950.0,41640950.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
 VIVK,8183626.0,8183626.0,8183626.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-RVP,29937159.0,29937159.0,29937159.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+RVP,29937159.0,29937159.0,29937159.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-99 exhibit parser + 10-Q second-pass filing parser
 KE,23966995.0,23966995.0,23966995.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-K second-pass filing parser
-USBC,388144429.0,388144429.0,388144429.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-CTO-PA,33783592.0,33783592.0,33783592.0,1.0,117200000.0,0.18210707782408855,low,heuristic filing-text parser + 10-Q second-pass filing parser
+USBC,388144429.0,388144429.0,388144429.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
+CTO-PA,33783592.0,33783592.0,33783592.0,1.0,117200000.0,0.1810615720897712,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 AOMN,23214877.0,23214877.0,23214877.0,1.0,75000000.0,0.128812702613375,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 AUB-PA,142814896.0,142814896.0,142814896.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 ELMD,8366163.0,8541163.0,8541163.0,1.020917593883839,0.0,0.0,medium,heuristic filing-text parser + 10-K second-pass filing parser
 QSEAU,10134518.0,10134518.0,10134518.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 COPL-WT,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
-STRK,39280500.0,39280500.0,39280500.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+STRK,19640250.0,19640250.0,19640250.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 CHPT,26850324.0,28521324.0,28521326.0806,1.0622339633815965,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 RFL,100.0,100.0,100.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 CNTB,62974309.0,62974309.0,62974309.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-LIDR,46488312.0,46488312.0,46488312.0,1.0,70400000.0,1.2833552571480729,low,heuristic filing-text parser + 10-Q second-pass filing parser
+LIDR,46488312.0,46488312.0,46488312.0,1.0,70400000.0,1.2888163383622264,low,heuristic filing-text parser + 10-Q second-pass filing parser
 GUTS,159179848.0,180326850.0,180326850.0,1.132849743643429,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 HIT,65534658.0,66822658.0,76355547.0,1.1651170438701306,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 SLE,1695120.0,3029704.0,3029704.0,1.7873094530180753,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
@@ -220,33 +222,32 @@ WLYB,60884591.0,60884591.0,60884591.0,1.0,0.0,0.0,low,SEC companyfacts metadata 
 CICB,49202704.0,49202704.0,49202704.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 FLDDW,55077187.0,55077187.0,55077187.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 GWH,32970025.0,38070025.0,38070025.0,1.154685960959993,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-SRFM,100396873.0,100396873.0,100396873.0,1.0,30000000.0,0.2514211828500891,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+SRFM,100396873.0,100396873.0,100396873.0,1.0,30000000.0,0.25430987207888756,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 WSBK,9295376.0,9295376.0,9295376.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-K second-pass filing parser
-JBIO,63597387.0,64999479.0,64999479.0,1.0220463774714519,29300000.0,0.03252458548520117,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-IMNN,5611403.0,5611403.0,5611403.0,1.0,12202152.0,1.685680539760805,low,heuristic filing-text parser + 10-Q second-pass filing parser
+JBIO,63597387.0,64999479.0,64999479.0,1.0220463774714519,29300000.0,0.03279080042012892,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+IMNN,5611403.0,5611403.0,5611403.0,1.0,12202152.0,1.7122266650755598,low,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
 UPXI,82102474.0,89600281.0,125308394.0,1.5262438254905693,0.0,0.0,medium,heuristic filing-text parser + 10-K second-pass filing parser
 AMOD,4966818.0,56588378.0,56588378.0,11.393286003231848,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 BBLGW,2756057.0,4868734.0,4868734.0,1.766557803412629,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 CAPS,20578551.0,20983551.0,26789119.0,1.3017981197995914,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-BYSI,41119820.0,41119820.0,41119820.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+BYSI,41119820.0,41119820.0,41119820.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 AIM,30442139.0,47263457.0,47263457.0,1.5525668876290197,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-IVVD,294758746.0,316101188.0,316101188.0,1.0724064757691703,75000000.0,0.3030915701212132,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+IVVD,294758746.0,316101188.0,316101188.0,1.0724064757691703,75000000.0,0.2993827202987255,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 HCWB,1836324.0,2858328.0,2858328.0,1.5565488443215902,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 SLQT,176573132.0,191989798.5,191989798.5,1.0873103757371194,0.0,0.0,medium,heuristic filing-text parser + 10-K second-pass filing parser
-SGP,33447979.0,33447979.0,33447979.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+SGP,33447979.0,33447979.0,33447979.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 FRMEP,63022741.0,63022741.0,63022741.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 AZTR,60603742.0,66756985.0,66756985.0,1.1015323938247905,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 REED,11857086.0,11857086.0,11857086.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 APURR,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
-GPUS-PD,1529995.0,1529995.0,1529995.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-SVAQW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
-AVAT,650000000.0,650000000.0,650000000.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+GPUS-PD,1529995.0,1529995.0,1529995.0,1.0,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
+SVAQW,0.0,0.0,0.0,,0.0,,low,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+AVAT,43720444.0,43720444.0,43720444.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 NAMSW,119537169.0,119537169.0,119537169.0,1.0,0.0,0.0,low,SEC companyfacts metadata precheck
 EPOW,25361550.0,25361550.0,25361550.0,1.0,0.0,0.0,low,heuristic filing-text parser
 CLRO,2675412.0,3112912.0,3112912.0,1.1635262157753647,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 VBNB,90000.0,90000.0,90000.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-K second-pass filing parser
 MODD,8150823.0,8236111.0,8246111.0,1.0116905986058096,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-PARAW,10000.0,304917.0,304917.0,30.4917,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 CALC,34141460.0,34447966.0,34447966.0,1.0089775305449737,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 CHGA,19946803.0,20922728.0,20922728.0,1.0489263868500631,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 TPET,5323907.0,5323907.0,5323907.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
@@ -256,17 +257,16 @@ AMODW,4966818.0,56588378.0,56588378.0,11.393286003231848,0.0,0.0,medium,heuristi
 GANX,43643619.0,45894439.0,45894439.0,1.0515727167355209,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 ILLRW,20487382.0,20487382.0,20487382.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 APUS,1509118.0,1509118.0,1509118.0,1.0,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-GPRO,1129944.0,12206912.0,27706912.0,24.520606330933216,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-SHFSW,12332955.0,12332955.0,12332955.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+SHFSW,12332955.0,12336153.0,12336153.0,1.000259305251661,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 SDOT,1320015.0,1320015.0,14095015.0,10.677920326662955,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-MKZR,2774688.0,2903914.5,2903914.5,1.0465733444625125,0.0,0.0,medium,heuristic filing-text parser + 10-K second-pass filing parser
-CYCUW,25840335.0,25840335.0,25840335.0,1.0,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-TVGNW,6511540.0,6886540.0,6886540.0,1.0575900631801387,6400000.0,14.453975855782435,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-BIAFW,8101725.0,11061725.0,11061725.0,1.3653542918329122,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-AEON,49882790.0,82719798.0,82719798.0,1.6582833077299806,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+MKZR,2774688.0,2903914.5,2903914.5,1.0465733444625125,0.0,0.0,medium,heuristic filing-text parser + EX-99.1 exhibit parser + 10-K second-pass filing parser
+CYCUW,25840335.0,25840335.0,25840335.0,1.0,0.0,0.0,medium,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+TVGNW,6511540.0,6886540.0,6886540.0,1.0575900631801387,6400000.0,16.086259137102058,medium,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+BIAFW,8101725.0,11061725.0,11061725.0,1.3653542918329122,0.0,0.0,medium,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+AEON,49882790.0,82719798.0,82719798.0,1.6582833077299806,0.0,0.0,medium,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 CTOR,92981204.0,93492315.0,93492315.0,1.00549692817486,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-SDEV,50615437.0,218154664.0,218154664.0,4.31004209249443,75000000.0,0.40373869785690514,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-SCLXW,8493000.0,8729672.0,8729672.0,1.0278667137642765,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
-SLXNW,5560256.0,5560256.0,5560256.0,1.0,200000.0,4.732837666098751,low,heuristic filing-text parser + 10-Q second-pass filing parser
+SDEV,50615437.0,218154664.0,218154664.0,4.31004209249443,75000000.0,0.3972444217485315,medium,heuristic filing-text parser + 10-Q second-pass filing parser
+SCLXW,8493000.0,8729672.0,8729672.0,1.0278667137642765,0.0,0.0,medium,heuristic filing-text parser + EX-10.1 exhibit parser + 10-Q second-pass filing parser
+SLXNW,5560256.0,5560256.0,5560256.0,1.0,200000.0,4.732837666098751,low,heuristic filing-text parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + 10-Q second-pass filing parser
 DAICW,2337767.0,2568537.0,11001660.0,4.706054966127933,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser
 GWAV,829631.0,5250091.0,5250091.0,6.328224234629612,0.0,0.0,medium,heuristic filing-text parser + 10-Q second-pass filing parser

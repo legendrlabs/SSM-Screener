@@ -1,0 +1,1 @@
+Trigger first live SSM scan on ubuntu-slim after runner-pool validation.

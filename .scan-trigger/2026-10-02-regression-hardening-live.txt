@@ -1,0 +1,1 @@
+Trigger hosted SSM scan after SAFE_TO_ACT, cover-share, dilution, ATM, and GWH regression hardening.

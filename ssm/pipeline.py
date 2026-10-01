@@ -119,6 +119,8 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             c.latest_financial_form = financial_record.get("form")
             c.latest_financial_accession = financial_record.get("accession")
         common = _common_shares(sec.companyfacts(meta["cik"]))
+        if common > 0:
+            c.common_shares_source = "companyfacts"
     except Exception as e:
         common = 0.0
         c.data_warnings.append(f"SEC facts error: {e}")
@@ -172,10 +174,12 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             if common <= 0 and cover_common > 0:
                 common = cover_common
                 c.dilution.common_shares = cover_common
+                c.common_shares_source = "10-Q/10-K cover"
                 c.data_warnings.append("Common shares resolved from latest 10-Q/10-K cover page.")
             elif common > 0 and cover_common > 0:
                 ratio = cover_common / common
                 if ratio < 0.8 or ratio > 1.25:
+                    c.share_count_conflict = True
                     c.data_warnings.append(
                         f"Companyfacts vs cover-page shares differ materially ({common:.0f} vs {cover_common:.0f})."
                     )

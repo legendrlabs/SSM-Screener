@@ -81,3 +81,25 @@ def cover_page_common_shares(text: str) -> float:
     for m in generic_pattern.finditer(plain):
         generic.append(float(m.group(1).replace(",", "")))
     return max(generic) if generic else 0.0
+
+
+def extract_atm_remaining_usd(text: str) -> float:
+    plain = re.sub(r"<[^>]+>", " ", text or "")
+    plain = re.sub(r"&nbsp;|&#160;", " ", plain, flags=re.I)
+    plain = re.sub(r"\s+", " ", plain)
+    amount = r"\$\s*(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)?"
+    patterns = [
+        rf"{amount}.{{0,100}}?(?:remaining|remain(?:ed|s)?|available).{{0,140}}?(?:at-the-market|sales agreement)",
+        rf"(?:at-the-market|sales agreement).{{0,180}}?{amount}.{{0,100}}?(?:remaining|remain(?:ed|s)?|available)",
+    ]
+    values = []
+    for pattern in patterns:
+        for m in re.finditer(pattern, plain, re.I):
+            raw = float(m.group(1).replace(",", ""))
+            unit = (m.group(2) or "").lower()
+            if unit in ("million", "m"):
+                raw *= 1_000_000
+            elif unit in ("thousand", "k"):
+                raw *= 1_000
+            values.append(raw)
+    return max(values) if values else 0.0

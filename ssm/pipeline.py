@@ -182,6 +182,10 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             for k, v in filing_risk_flags(financial_text).items():
                 setattr(c, k, bool(getattr(c, k)) or bool(v))
             fin_dilution, fin_warnings = heuristic_extract_dilution(financial_text, common)
+            fin_dilution.atm_remaining_usd = max(
+                fin_dilution.atm_remaining_usd,
+                extract_atm_remaining_usd(financial_text),
+            )
             fin_dilution.source = f"{financial_record.get('form')} second-pass filing parser"
             c.dilution = conservative_merge_dilution(c.dilution, fin_dilution)
             c.dilution = apply_override(c.dilution, overrides.get(c.ticker, {}))

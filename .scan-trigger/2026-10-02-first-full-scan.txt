@@ -1,0 +1,1 @@
+Trigger first full SSM live scan after v0.1 initialization.

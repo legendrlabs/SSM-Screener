@@ -62,26 +62,27 @@ def cover_page_common_shares(text: str) -> float:
     plain = re.sub(r"\s+", " ", plain)
 
     class_values = {}
-    class_pattern = re.compile(
-        r"(\d[\d,]*)\s+shares\s+of\s+(Class\s+[A-Z0-9-]+)\s+common stock.{0,260}?outstanding",
-        re.I,
-    )
-    for m in class_pattern.finditer(plain):
-        value = float(m.group(1).replace(",", ""))
-        label = m.group(2).upper()
-        class_values[label] = max(class_values.get(label, 0.0), value)
+    for outstanding in re.finditer(r"\boutstanding\b", plain, re.I):
+        window = plain[max(0, outstanding.start() - 420):outstanding.end()]
+        for m in re.finditer(
+            r"(\d[\d,]*)\s+shares\s+of\s+(Class\s+[A-Z0-9-]+)\s+common stock",
+            window,
+            re.I,
+        ):
+            value = float(m.group(1).replace(",", ""))
+            label = m.group(2).upper()
+            class_values[label] = max(class_values.get(label, 0.0), value)
     if class_values:
         return sum(class_values.values())
 
     generic = []
-    generic_pattern = re.compile(
+    for m in re.finditer(
         r"(\d[\d,]*)\s+shares\s+of\s+(?:our\s+)?common stock.{0,180}?outstanding",
+        plain,
         re.I,
-    )
-    for m in generic_pattern.finditer(plain):
+    ):
         generic.append(float(m.group(1).replace(",", "")))
     return max(generic) if generic else 0.0
-
 
 def extract_atm_remaining_usd(text: str) -> float:
     plain = re.sub(r"<[^>]+>", " ", text or "")

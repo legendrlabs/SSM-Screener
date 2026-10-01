@@ -51,6 +51,21 @@ export APCA_API_KEY_ID=...
 export APCA_API_SECRET_KEY=...
 ```
 
+## SEC discovery modes
+
+SSM은 두 가지 SEC discovery 경로를 지원합니다.
+
+- `SSM_SEC_DISCOVERY_MODE=atom` — GitHub-hosted/public 배포 기본값. SEC Latest Filings Atom feed로 신규 filing을 발견하고, `data.sec.gov/submissions` + `companyfacts`로 검증한 뒤 filing 본문을 직접 읽습니다.
+- `SSM_SEC_DISCOVERY_MODE=daily-index` — 로컬/self-hosted 전용. EDGAR daily master index를 사용합니다.
+- `auto` — daily-index를 먼저 시도하고 403이면 atom으로 자동 fallback합니다.
+
+GitHub-hosted runner에서는 EDGAR daily-index가 403을 반환할 수 있지만, Atom feed, submissions API, companyfacts API, 개별 filing 문서는 정상 접근되는 것을 endpoint probe로 확인했습니다.
+
+```bash
+export SSM_SEC_DISCOVERY_MODE=atom
+ssm scan --days 7 --out output
+```
+
 ## 결과 파일
 
 - `output/quality.json`

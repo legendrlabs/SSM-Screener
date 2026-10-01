@@ -1,0 +1,1 @@
+Trigger first hosted cloud-safe SSM scan using SEC Atom discovery.

@@ -12,3 +12,8 @@ def test_illiquid():c=base();c.adv20_usd=10_000;assert evaluate_gates(c,CFG)[0]=
 def test_financial_review_required():
     c=base();c.financial_review_complete=False
     assert evaluate_gates(c,CFG)[0]=="DATA_HOLD"
+
+
+def test_share_count_conflict_holds():
+    c=base();c.share_count_conflict=True
+    assert evaluate_gates(c,CFG)[0]=="DATA_HOLD"

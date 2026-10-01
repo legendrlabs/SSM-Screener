@@ -1,0 +1,10 @@
+{
+  "SAFE_TO_ACT": true,
+  "sec_discovery_mode": "atom",
+  "candidate_count": 270,
+  "financial_review_incomplete_count": 80,
+  "data_hold_count": 97,
+  "pass_count": 30,
+  "watch_count": 66,
+  "reject_count": 77
+}

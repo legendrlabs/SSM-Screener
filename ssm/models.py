@@ -45,6 +45,10 @@ class Candidate:
     return_5d_pct: Optional[float] = None
     public_float: Optional[float] = None
     latest_financial_filing_date: Optional[str] = None
+    latest_financial_form: Optional[str] = None
+    latest_financial_accession: Optional[str] = None
+    financial_review_complete: bool = False
+    financial_note_hits: List[str] = field(default_factory=list)
     latest_event_date: Optional[str] = None
     latest_event_form: Optional[str] = None
     latest_event_accession: Optional[str] = None

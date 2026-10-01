@@ -248,12 +248,32 @@ class SecClient:
             out["filename"] = f"edgar/data/{int(cik)}/{acc.replace('-', '')}/{doc}"
         return out
 
-    def latest_financial_filing(self, cik):
+    def latest_financial_record(self, cik):
         r = self.submissions(cik).get("filings", {}).get("recent", {})
-        for form, filed in zip(r.get("form", []), r.get("filingDate", [])):
-            if form in ("10-Q", "10-K"):
-                return filed
+        n = len(r.get("form", []))
+        for i in range(n):
+            form = r.get("form", [""] * n)[i]
+            if form not in ("10-Q", "10-K"):
+                continue
+            filed = r.get("filingDate", [""] * n)[i]
+            acc = r.get("accessionNumber", [""] * n)[i]
+            doc = r.get("primaryDocument", [""] * n)[i]
+            desc = r.get("primaryDocDescription", [""] * n)[i] if i < len(r.get("primaryDocDescription", [])) else ""
+            return {
+                "cik": str(int(cik)),
+                "form": form,
+                "filed": filed,
+                "accession": acc,
+                "primary_document": doc,
+                "primary_description": desc or "",
+                "filename": f"edgar/data/{int(cik)}/{acc.replace('-', '')}/{doc}",
+                "source": "submissions-financial",
+            }
         return None
+
+    def latest_financial_filing(self, cik):
+        rec = self.latest_financial_record(cik)
+        return rec.get("filed") if rec else None
 
     def companyfacts(self, cik):
         key = str(int(cik))

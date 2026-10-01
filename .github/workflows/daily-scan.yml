@@ -17,7 +17,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-slim
-    timeout-minutes: 14
+    timeout-minutes: 30
     permissions:
       contents: write
     steps:
@@ -33,15 +33,14 @@ jobs:
           SSM_MARKET_PROVIDER: yfinance
           SSM_SEC_DISCOVERY_MODE: atom
         run: ssm scan --days 7 --out output
+      - name: Preserve scan snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: ssm-scan-${{ github.run_id }}
+          path: output/
+          retention-days: 7
       - name: Commit outputs
         run: |
           git config user.name "ssm-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -f output/
-          if git diff --cached --quiet; then
-            echo "No output changes."
-          else
-            git commit -m "chore: update SSM screening outputs"
-            git pull --rebase origin main
-            git push origin HEAD:main
-          fi
+          python scripts/publish_outputs.py

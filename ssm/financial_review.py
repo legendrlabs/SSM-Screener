@@ -1,5 +1,6 @@
 from __future__ import annotations
 import re
+import html
 from .models import Dilution
 
 NOTE_PATTERNS = {
@@ -46,18 +47,26 @@ def conservative_merge_dilution(current: Dilution, financial: Dilution) -> Dilut
     out = Dilution(
         common_shares=max(current.common_shares, financial.common_shares),
         source=" + ".join(x for x in [current.source, financial.source] if x),
-        confidence="medium" if "medium" in {current.confidence, financial.confidence} else "low",
+        confidence="low" if "low" in {current.confidence, financial.confidence} else "medium",
     )
-    if "high" in {current.confidence, financial.confidence}:
+    if current.confidence == financial.confidence == "high":
         out.confidence = "high"
     for field in DILUTION_FIELDS:
         setattr(out, field, max(float(getattr(current, field, 0) or 0), float(getattr(financial, field, 0) or 0)))
     return out
 
 
+def visible_filing_text(text: str) -> str:
+    # Inline-XBRL headers contain hidden facts, contexts and even entire note
+    # narratives. They are not the human-readable cover or financing terms.
+    plain = re.sub(r'<(ix:header|ix:hidden|script|style)\b[^>]*>.*?</\1\s*>',
+                   ' ', text or '', flags=re.I | re.S)
+    plain = re.sub(r"<[^>]+>", " ", plain)
+    return re.sub(r'\s+', ' ', html.unescape(plain)).strip()
+
+
 def _cover_plain_text(text: str, max_chars: int = 60000) -> str:
-    plain = re.sub(r"<[^>]+>", " ", text or "")
-    plain = re.sub(r"&nbsp;|&#160;", " ", plain, flags=re.I)
+    plain = visible_filing_text(text)
     plain = re.sub(r"\s+", " ", plain).strip()
     head = plain[:max_chars]
     for marker in (
@@ -66,7 +75,7 @@ def _cover_plain_text(text: str, max_chars: int = 60000) -> str:
         r"\bPART\s+II\b",
     ):
         m = re.search(marker, head, re.I)
-        if m and m.start() > 500:
+        if m:
             head = head[:m.start()]
             break
     return head
@@ -74,6 +83,13 @@ def _cover_plain_text(text: str, max_chars: int = 60000) -> str:
 def cover_page_common_shares(text: str) -> float:
     """Resolve cover-page shares only; never scan notes/MD&A for this fallback."""
     plain = _cover_plain_text(text)
+
+    combined = re.search(
+        r'(\d[\d,]*)\s+and\s+(\d[\d,]*)\s+shares\s+of\s+Class\s+[A-Z0-9-]+'
+        r'\s+and\s+Class\s+[A-Z0-9-]+\s+common stock[^.]{0,120}?outstanding',
+        plain, re.I)
+    if combined:
+        return sum(float(value.replace(',', '')) for value in combined.groups())
 
     class_values = {}
     # Common SEC cover-page wording: "N shares of Class A common stock ... outstanding".
@@ -99,7 +115,8 @@ def cover_page_common_shares(text: str) -> float:
     ]
     for pattern in patterns:
         for m in re.finditer(pattern, plain, re.I):
-            generic.append(float(m.group(1).replace(",", "")))
+            if not re.search(r'authorized|treasury', m.group(0), re.I):
+                generic.append(float(m.group(1).replace(",", "")))
     return max(generic) if generic else 0.0
 
 def extract_atm_remaining_usd(text: str) -> float:

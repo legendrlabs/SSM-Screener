@@ -1,0 +1,1 @@
+Validate unresolved dilution gates, visible GPRO cover and coherent output publishing.

@@ -55,15 +55,30 @@ def conservative_merge_dilution(current: Dilution, financial: Dilution) -> Dilut
     return out
 
 
-def cover_page_common_shares(text: str) -> float:
-    """Fallback for issuers whose companyfacts shares tag is missing or stale."""
+def _cover_plain_text(text: str, max_chars: int = 60000) -> str:
     plain = re.sub(r"<[^>]+>", " ", text or "")
     plain = re.sub(r"&nbsp;|&#160;", " ", plain, flags=re.I)
-    plain = re.sub(r"\s+", " ", plain)
+    plain = re.sub(r"\s+", " ", plain).strip()
+    head = plain[:max_chars]
+    for marker in (
+        r"\bPART\s+I\b",
+        r"\bITEM\s+1[\.:]\s",
+        r"\bPART\s+II\b",
+    ):
+        m = re.search(marker, head, re.I)
+        if m and m.start() > 500:
+            head = head[:m.start()]
+            break
+    return head
+
+def cover_page_common_shares(text: str) -> float:
+    """Resolve cover-page shares only; never scan notes/MD&A for this fallback."""
+    plain = _cover_plain_text(text)
 
     class_values = {}
+    # Common SEC cover-page wording: "N shares of Class A common stock ... outstanding".
     for outstanding in re.finditer(r"\boutstanding\b", plain, re.I):
-        window = plain[max(0, outstanding.start() - 420):outstanding.end()]
+        window = plain[max(0, outstanding.start() - 500):outstanding.end()]
         for m in re.finditer(
             r"(\d[\d,]*)\s+shares\s+of\s+(Class\s+[A-Z0-9-]+)\s+common stock",
             window,
@@ -75,13 +90,16 @@ def cover_page_common_shares(text: str) -> float:
     if class_values:
         return sum(class_values.values())
 
+    # Generic single-class cover wording.
     generic = []
-    for m in re.finditer(
-        r"(\d[\d,]*)\s+shares\s+of\s+(?:our\s+)?common stock.{0,180}?outstanding",
-        plain,
-        re.I,
-    ):
-        generic.append(float(m.group(1).replace(",", "")))
+    patterns = [
+        r"(?:as of|on)\s+[^.]{0,120}?there (?:were|was)\s+(\d[\d,]*)\s+shares\s+of\s+(?:our\s+)?common stock[^.]{0,120}?outstanding",
+        r"(\d[\d,]*)\s+shares\s+of\s+(?:our\s+)?common stock[^.]{0,180}?outstanding",
+        r"common stock[^.]{0,180}?(\d[\d,]*)\s+shares[^.]{0,120}?outstanding",
+    ]
+    for pattern in patterns:
+        for m in re.finditer(pattern, plain, re.I):
+            generic.append(float(m.group(1).replace(",", "")))
     return max(generic) if generic else 0.0
 
 def extract_atm_remaining_usd(text: str) -> float:

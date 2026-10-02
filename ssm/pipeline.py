@@ -330,6 +330,10 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             c.event_review_complete = False
             c.data_warnings.append('Planned last trading date has passed; current listing/liquidation status requires a newer source.')
 
+    if c.event_terms.get('capital_counts_require_reconciliation'):
+        c.dilution.confidence = 'low'
+    if c.event_terms.get('post_transaction_ticker', c.ticker) != c.ticker:
+        c.price = c.adv20_usd = None
     c.data_warnings = list(dict.fromkeys(c.data_warnings))
 
     c.gate_status, reasons = evaluate_gates(c, cfg)

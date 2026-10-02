@@ -88,6 +88,8 @@ class Candidate:
     bucket: str = "DATA_HOLD"
 
     def basic_market_cap(self):
+        if self.event_terms.get('capital_counts_require_reconciliation'): return None
+        if self.event_terms.get('post_transaction_ticker', self.ticker) != self.ticker: return None
         if self.security_type != 'COMMON_EQUITY' or self.event_status in {'TERMINAL', 'CANCELLED'} or self.gate_status == 'EXCLUDED': return None
         return self.price * self.dilution.common_shares if self.price is not None and self.dilution.common_shares > 0 else None
 
@@ -119,6 +121,6 @@ class Candidate:
             "strict_fd_market_cap": self.strict_fd_market_cap(),
             "nav_coverage": self.nav_coverage(),
             "atm_ratio": self.atm_ratio(),
-            "fd_ratio": self.dilution.fd_ratio,
+            "fd_ratio": None if self.event_terms.get('capital_counts_require_reconciliation') else self.dilution.fd_ratio,
         })
         return d

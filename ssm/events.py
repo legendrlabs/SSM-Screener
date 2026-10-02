@@ -2,7 +2,7 @@
 from datetime import date, datetime, timedelta
 import re
 
-from .event_rules import classify_event, operative_text, liquidation_evidence, adopted_rights_plan, resale_registration, closed_debt_equity_exchange, merger_share_consideration, MERGER_KINDS
+from .event_rules import classify_event, operative_text, liquidation_evidence, adopted_rights_plan, resale_registration, closed_debt_equity_exchange, merger_share_consideration, merger_parent_name, completed_merger, MERGER_KINDS
 
 PRIORITY = {'TERMINAL_MERGER': 110, 'MERGER_TERMINATED': 105,
             'LIQUIDATION_DISTRIBUTION': 100, 'MERGER_CASH_CVR': 90, 'REVERSE_MERGER_CVR': 90, 'MERGER_CVR_UNVERIFIED': 85,
@@ -67,6 +67,29 @@ def event_terms(text, kind, *, cleaned=False):
             terms.update(merger_share_consideration(t))
             if kind == 'MERGER_STOCK':
                 terms.pop('cash_per_share_usd', None)
+        if completed_merger(t):
+            def quantity(pattern):
+                m = re.search(pattern, t, re.I)
+                return int(float(m.group(1).replace(',', '')) * (1e6 if m.group(2) else 1)) if m else None
+            fields = {
+                'new_common_shares_issued_reported': r'(?:Company|issuer) issued (?:approximately )?([\d,.]+)\s*(million)? shares of Common Stock',
+                'replacement_options_reported': r'([\d,.]+)\s*(million)? Replacement Options',
+                'replacement_warrants_reported': r'([\d,.]+)\s*(million)? Replacement Warrants',
+                'source_reported_post_merger_common_shares': r'there were (?:approximately )?([\d,.]+)\s*(million)? shares of (?:Combined Company )?common stock issued and outstanding',
+                'source_reported_post_merger_fd_shares': r'aggregate of ([\d,.]+)\s*(million)? shares issuable on a fully diluted basis',
+            }
+            for key, pattern in fields.items():
+                value = quantity(pattern)
+                if value is not None:
+                    terms[key] = value
+            if any(key in terms for key in fields):
+                terms['capital_counts_as_reported'] = True
+                terms['capital_counts_require_reconciliation'] = True
+            if re.search(r'all references to share and per share amounts.{0,80}reflect (?:the )?Reverse Stock Split', t, re.I):
+                terms['reported_share_units'] = 'POST_REVERSE_SPLIT'
+            symbol = re.search(r'common stock.{0,180}under the ticker symbol [“"]([A-Z]+)[,”"]', t, re.I)
+            if symbol:
+                terms['post_transaction_ticker'] = symbol.group(1).upper()
     if kind == 'LIQUIDATION_DISTRIBUTION':
         distribution = None
         for clause in liquidation_evidence(t):
@@ -181,10 +204,47 @@ def event_status(text, kind, proof):
     return 'COMPLETED' if proof >= 3 else 'SIGNED'
 
 
+def _read_event_filing(sec, cik, filing):
+    primary = sec.submission_text(filing['filename'])
+    sources = ['https://www.sec.gov/Archives/' + filing['filename']]
+    text = primary
+    narratives = [operative_text(primary)]
+    if filing.get('form') == '8-K' and re.search(r'Exhibit\s+99\.|99\.\d', primary, re.I):
+        for doc in sec.filing_documents(cik, filing.get('accession'), filing.get('index_url')):
+            if doc['type'].startswith('EX-99'):
+                exhibit = sec.submission_text(doc['url'])
+                text += '\n' + exhibit
+                narratives.append(operative_text(exhibit))
+                sources.append(doc['url'])
+    narrative = '\n'.join(narratives)
+    label, proof, summary = classify_event(narrative, cleaned=True)
+    return {**filing, 'event_type': label, 'event_proof': proof,
+            'event_status': event_status(narrative, label, proof), 'summary': summary,
+            'terms': event_terms(narrative, label, cleaned=True), 'sources': sources,
+            'text': primary, 'combined_text': text, 'narrative': narrative}
+
+
+def same_merger_counterparty(current, prior):
+    parent = merger_parent_name(operative_text(prior['text']))
+    if not parent:
+        return False
+    names = [parent]
+    # A shortened brand must be explicitly defined by the original source.
+    narrative = prior.get('narrative', operative_text(prior['combined_text']))
+    alias = re.escape(parent) + r'\s*(?:\((?:Nasdaq|NYSE):[^)]*\)\s*)?\([“"]([^”"]+)[”"]'
+    names.extend(m.group(1) for m in re.finditer(alias, narrative, re.I)
+                 if m.group(1).lower() not in {'parent', 'company', 'the company'})
+    return any(re.search(r'\b' + re.escape(name) + r'\s*,?\s*(?:and\b|in consultation with\b)', current, re.I)
+               for name in names)
+
+
 def review_material_events(sec, cik, discovered, cfg):
     recent = sec.submissions(cik).get('filings', {}).get('recent', {})
     cutoff = (date.today() - timedelta(days=cfg['event_max_age_days'])).isoformat()
-    filings = {discovered.get('accession') or discovered.get('filename'): dict(discovered)}
+    declared_items = set(re.split(r'[,;]', discovered.get('items', '') or ''))
+    eligible_discovered = (discovered.get('form') != '8-K' or not discovered.get('items')
+                           or bool(declared_items.intersection(cfg['material_8k_items'])))
+    filings = {discovered.get('accession') or discovered.get('filename'): dict(discovered)} if eligible_discovered else {}
     for i, form in enumerate(recent.get('form', [])):
         if form != '8-K' or recent['filingDate'][i] < cutoff:
             continue
@@ -197,32 +257,40 @@ def review_material_events(sec, cik, discovered, cfg):
     reviewed, warnings = [], []
     for filing in filings.values():
         try:
-            primary = sec.submission_text(filing['filename'])
-            sources = ['https://www.sec.gov/Archives/' + filing['filename']]
-            text = primary
-            narratives = [operative_text(primary)]
-            if filing.get('form') == '8-K' and re.search(r'Exhibit\s+99\.|99\.\d', primary, re.I):
-                # Incorporated press releases own economic terms. Select them
-                # by type; a pile of EX-10 documents cannot crowd them out.
-                for doc in sec.filing_documents(cik, filing.get('accession'), filing.get('index_url')):
-                    if doc['type'].startswith('EX-99'):
-                        exhibit = sec.submission_text(doc['url'])
-                        text += '\n' + exhibit
-                        narratives.append(operative_text(exhibit))
-                        sources.append(doc['url'])
-            # Clean each document before joining; one document's Item 9 or
-            # cautionary section must not hide another's consideration terms.
-            narrative = '\n'.join(narratives)
-            label, proof, summary = classify_event(narrative, cleaned=True)
-            terms = event_terms(narrative, label, cleaned=True)
-            reviewed.append({**filing, 'event_type': label, 'event_proof': proof,
-                             'event_status': event_status(text, label, proof), 'summary': summary,
-                             'terms': terms,
-                             'sources': sources, 'text': primary, 'combined_text': text})
+            reviewed.append(_read_event_filing(sec, cik, filing))
         except Exception as exc:
             warnings.append(f"Event review failed for {filing.get('accession')}: {exc}")
     selected = select_event(reviewed)
     if selected:
         selected = dict(selected)
         selected['selection_reason'] = 'Retain an active merger/liquidation lifecycle; otherwise select the most recent material economic event.'
+        current = operative_text(selected['combined_text'])
+        missing_payout = not any(k in selected['terms'] for k in ('cash_per_share_usd', 'stock_exchange_ratio', 'legacy_holder_ownership_pct'))
+        if (selected['event_type'] in MERGER_KINDS and missing_payout
+                and re.search(r'regulatory|HSR|Hart-Scott|waiting period', current, re.I)
+                and re.search(r'Merger Agreement', current, re.I)
+                and not re.search(r'(?:amended|amendment to|revised|new).{0,45}(?:merger agreement|agreement and plan of merger|consideration)|(?:merger agreement|consideration).{0,25}(?:amended|revised)', current, re.I)):
+            oldest = (date.today() - timedelta(days=cfg.get('financial_filing_max_age_days', 210))).isoformat()
+            candidates = list(reviewed)
+            for i, form in enumerate(recent.get('form', [])):
+                if (form == '8-K' and oldest <= recent['filingDate'][i] < cutoff
+                        and '1.01' in (recent.get('items', [''] * len(recent['form']))[i] or '')):
+                    acc = recent['accessionNumber'][i]
+                    filing = {'cik': cik, 'form': form, 'filed': recent['filingDate'][i], 'accession': acc,
+                              'filename': f"edgar/data/{int(cik)}/{acc.replace('-', '')}/{recent['primaryDocument'][i]}"}
+                    try:
+                        candidates.append(_read_event_filing(sec, cik, filing))
+                    except Exception as exc:
+                        warnings.append(f'Merger term source review failed for {acc}: {exc}')
+            for prior in sorted(candidates, key=lambda x: x.get('filed', ''), reverse=True):
+                if (prior['event_type'] in MERGER_KINDS and prior['event_proof'] >= 2
+                        and same_merger_counterparty(current, prior)
+                        and any(k in prior['terms'] for k in ('cash_per_share_usd', 'stock_exchange_ratio'))):
+                    selected['terms'] = {k: v for k, v in prior['terms'].items() if k != 'transaction_date'} | selected['terms']
+                    selected['terms'].update(merger_terms_source_accession=prior['accession'], merger_terms_source_date=prior['filed'])
+                    selected['sources'] = list(dict.fromkeys(selected['sources'] + prior['sources']))
+                    selected['event_type'] = prior['event_type']
+                    selected['summary'] = prior['summary']
+                    selected['selection_reason'] += ' Consideration retained from the original same-counterparty agreement; latest regulatory update retained.'
+                    break
     return selected, reviewed, warnings

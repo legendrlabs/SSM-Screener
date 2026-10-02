@@ -31,6 +31,12 @@ def _terms(c):
     if 'backstop_exchange_common_shares' in t: parts.append(f"Backstop exchange: {t['backstop_exchange_common_shares']:,} common shares to be issued")
     if 'combined_notes_principal_reduction_usd' in t: parts.append(f"Expected notes principal reduction: {_m(t['combined_notes_principal_reduction_usd'])}, combining exchange and par redemptions")
     if 'expected_post_transaction_common_shares' in t: parts.append(f"Expected post-transaction issued common shares: {t['expected_post_transaction_common_shares']:,}; requires reconciliation and is not the current FD share count")
+    for key, label in [('new_common_shares_issued_reported', 'New common shares issued'), ('replacement_options_reported', 'Replacement options'), ('replacement_warrants_reported', 'Replacement warrants'), ('source_reported_post_merger_common_shares', 'Post-merger common shares'), ('source_reported_post_merger_fd_shares', 'Post-merger fully diluted shares')]:
+        if key in t: parts.append(f"{label}, as reported: {t[key]:,}")
+    if t.get('reported_share_units') == 'POST_REVERSE_SPLIT': parts.append('Reported share quantities reflect the reverse split')
+    if t.get('capital_counts_require_reconciliation'): parts.append('Reported capital counts require reconciliation; computed FD economics remain unavailable')
+    if 'post_transaction_ticker' in t: parts.append(f"Post-merger ticker: {t['post_transaction_ticker']}")
+    if 'merger_terms_source_date' in t: parts.append(f"Consideration retained from the {t['merger_terms_source_date']} same-counterparty agreement; latest regulatory update retained")
     if t.get('cvr_conditional'):
         parts.append('CVR: contingent; ' + ('non-tradable' if t.get('cvr_transferable') is False else 'transfer terms require review'))
     if 'illustrative_total_per_share_usd' in t: parts.append(f"Full-performance illustration: ${t['illustrative_total_per_share_usd']:.2f}; per-share CVR varies, not a fixed guaranteed payout")

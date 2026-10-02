@@ -29,7 +29,6 @@ NNBR,82580864.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pas
 CSV,15882296.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + EX-99.2 exhibit parser + 10-Q second-pass filing parser
 AEMD,711136.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-4.1 exhibit parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + EX-10.4 exhibit parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 AGPU,11591124.0,,,,,,,83000000.0,0.6270272766184879,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
-APUR,0.0,,,,,,,0.0,,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + EX-10.4 exhibit parser + EX-10.5 exhibit parser + heuristic filing-text parser + 10-Q second-pass filing parser
 ESOA,18659181.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
 KLXER,,,,,,,,,,,Excluded: capital metrics are not applicable
 CHMG,4821472.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
@@ -72,6 +71,7 @@ SHAZ,0.0,,,,,,,0.0,,low,heuristic filing-text parser + heuristic filing-text par
 EDBL,1951509.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-99.1 exhibit parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 CTNT,36177712.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 CTO,33783592.0,,,,,,,117200000.0,0.1704736918221946,low,heuristic filing-text parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + 10-Q second-pass filing parser
+APUR,0.0,,,,,,,0.0,,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + EX-10.4 exhibit parser + EX-10.5 exhibit parser + heuristic filing-text parser + 10-Q second-pass filing parser
 VERI,100457068.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 BIRD,0.0,,,,,,,0.0,,low,heuristic filing-text parser + EX-99.1 exhibit parser + heuristic filing-text parser + 10-Q second-pass filing parser
 CRMT,8338478.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser

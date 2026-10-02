@@ -1,6 +1,6 @@
 {
   "SAFE_TO_ACT": false,
-  "sec_discovery_mode": "atom+submissions-content-recheck",
+  "sec_discovery_mode": "retained-scan+all-merger-selected-source-replay",
   "candidate_count": 320,
   "financial_review_incomplete_count": 65,
   "data_hold_count": 187,
@@ -9,27 +9,61 @@
   "reject_count": 75,
   "excluded_count": 56,
   "active_common_count": 214,
-  "source_commit": "badecd959aa6799a757c4b3c5b982a8cebae92e4",
-  "generated_at": "2026-10-02T06:16:44.512983+00:00",
-  "generation_mode": "full_scan_with_three_sec_content_rechecks_and_excluded_warrant_label_correction",
-  "base_snapshot_commit": "86ea8a9ff9ff0c1dcf59dd722096670c273c37fa",
+  "source_commit": "2bae3f0d7bdc70a810ebcd09891cfbd60ca8cdb3",
+  "generated_at": "2026-10-02T08:59:06.866224+00:00",
+  "generation_mode": "retained_full_scan_with_all_merger_selected_source_replay_and_klxe_terms",
+  "base_snapshot_commit": "4a51cab43b4ecfd9c661f499d881156983363041",
   "base_scan_source_commit": "768297f4dd2bb2d64bae1be66cacd1ee887a5710",
   "base_scan_workflow_run_id": "36962830987",
   "base_scan_generated_at": "2026-10-02T04:17:17.965153+00:00",
-  "content_corrected_tickers": [
+  "prior_content_corrected_tickers": [
     "DJTWW",
     "KLXE",
     "LRHC",
     "UWMC"
   ],
-  "refreshed_issuer_pipeline_tickers": [
+  "content_corrected_tickers": [
+    "APUR",
+    "CBNK",
+    "GPRO",
+    "KLXE"
+  ],
+  "selected_source_replayed_tickers": [
+    "ADGM",
+    "AEMD",
+    "ALLR",
+    "APUR",
+    "CBNK",
+    "DJTWW",
+    "FACT",
+    "FACTU",
+    "FACTW",
+    "FTW",
+    "GPRO",
+    "INM",
     "KLXE",
-    "LRHC",
-    "UWMC"
+    "LFCR",
+    "LPBB",
+    "LPBBU",
+    "LPBBW",
+    "NSTS",
+    "NTWO",
+    "NTWOU",
+    "NTWOW",
+    "OCLT",
+    "OCLTR",
+    "OCLTU",
+    "OCLTW",
+    "PUSA",
+    "SMTI",
+    "SZZL",
+    "SZZLR",
+    "SZZLU",
+    "VRME",
+    "XRPN",
+    "XRPNU",
+    "XRPNW"
   ],
-  "excluded_warrant_primary_reclassification": [
-    "DJTWW"
-  ],
-  "market_snapshot": "2026-10-01 closing snapshot retained; three issuer SEC filing and financial pipelines refreshed.",
-  "full_scan_note": "Retains the completed 320-row scan, with KLXE, LRHC and UWMC rechecked against current SEC filings and the excluded DJTWW warrant label corrected against its selected primary filing; does not claim a new full scan of every issuer."
+  "market_snapshot": "2026-10-01 closing snapshot retained; selected SEC transaction sources replayed.",
+  "full_scan_note": "All 33 existing merger rows, including excluded related securities, and KLXE selected filing narratives were fetched and replayed. Other issuer discovery, financial and market inputs retain the previous 320-row scan. This is not a fresh full-universe scan."
 }

@@ -2,7 +2,7 @@
 from datetime import date, datetime, timedelta
 import re
 
-from .event_rules import classify_event, operative_text
+from .event_rules import classify_event, operative_text, liquidation_evidence, adopted_rights_plan, resale_registration, closed_debt_equity_exchange
 
 PRIORITY = {'TERMINAL_MERGER': 110, 'MERGER_TERMINATED': 105,
             'LIQUIDATION_DISTRIBUTION': 100, 'MERGER_CASH_CVR': 90, 'REVERSE_MERGER_CVR': 90, 'MERGER_CVR_UNVERIFIED': 85,
@@ -64,12 +64,25 @@ def event_terms(text, kind, *, cleaned=False):
             if re.search(r'may declare', t, re.I):
                 terms['cvr_distribution_status'] = 'CONTEMPLATED'
     if kind == 'LIQUIDATION_DISTRIBUTION':
-        distribution = re.search(r'\$\s*(\d+(?:\.\d+)?)\s+per (?:common )?share.{0,70}(?:liquidating|liquidation|distribution)', t, re.I)
-        if not distribution:
-            distribution = re.search(r'(?:liquidating distribution|liquidating cash distribution|special.{0,20}distribution).{0,90}?\$\s*(\d+(?:\.\d+)?)\s+per (?:common )?share', t, re.I)
+        distribution = None
+        for clause in liquidation_evidence(t):
+            declaration = re.search(r'\b(?:approved|approves|declared|declares)\b(?P<gap>.{0,100}?)liquidating (?:cash )?distribution', clause, re.I)
+            if (not declaration or re.search(r'\bplan\b|contemplat|propos|consider', declaration.group('gap'), re.I)
+                    or re.search(r'subject to|contingent upon', clause, re.I)):
+                continue
+            # A preferred-holder amount is not a common-share distribution.
+            entitlement = clause[declaration.start():]
+            if re.search(r'preferred', clause, re.I):
+                distribution = re.search(r'\$\s*(\d+(?:\.\d+)?)\s+per common share(?!\s+par value)', entitlement, re.I)
+            else:
+                distribution = re.search(r'liquidating (?:cash )?distribution.{0,90}?\$\s*(\d+(?:\.\d+)?)\s*(?:\([^)]*\)\s*)?per (?:common )?share(?!\s+par value)', entitlement, re.I)
+                if not distribution:
+                    distribution = re.search(r'\$\s*(\d+(?:\.\d+)?)\s+per (?:common )?share(?!\s+par value).{0,50}liquidating (?:cash )?distribution', entitlement, re.I)
+            if distribution:
+                break
         if distribution:
             terms['distribution_per_share_usd'] = float(distribution.group(1))
-            terms['distribution_status'] = 'DECLARED' if re.search(r'declar|approved', t, re.I) else 'UNKNOWN'
+            terms['distribution_status'] = 'DECLARED'
         for key, anchor in [('payment_date', r'(?:special dividend|distribution).{0,30}(?:will be paid|is payable|payable) on|payment date (?:is|of)'),
                             ('record_date', r'record (?:on|date)'),
                             ('ex_dividend_date', r'ex[- ]dividend date (?:is|of|will be)'),
@@ -83,7 +96,7 @@ def event_terms(text, kind, *, cleaned=False):
             terms['ex_dividend_date'] = datetime.strptime(before_ex.group(1), '%B %d, %Y').date().isoformat()
         if re.search(r'due bills?|due[- ]bill', t, re.I):
             terms['due_bills'] = True
-        if re.search(r'dissolution|dissolve', t, re.I):
+        if 'dissolution_date' in terms or re.search(r'(?:company|registrant|issuer).{0,80}(?:intends? to|plans? to|will).{0,80}(?:voluntary dissolution|dissolve|terminate its existence)', t, re.I):
             terms['dissolution_status'] = 'PLANNED'
         if 'payment_date' not in terms:
             value = _date_after(t, r'(?:special dividend|distribution) will be paid on', 40)
@@ -93,13 +106,19 @@ def event_terms(text, kind, *, cleaned=False):
             value = _date_after(t, r'shareholders of record', 80)
             if value:
                 terms['record_date'] = value
+    if kind == 'LISTING_CAPITAL_STRUCTURE' and adopted_rights_plan(t):
+        terms['capital_structure_action'] = 'RIGHTS_PLAN'
+    if kind == 'LISTING_CAPITAL_STRUCTURE' and resale_registration(t):
+        terms['capital_structure_action'] = 'RESALE_REGISTRATION'
     if kind == 'DEBT_RESTRUCTURING':
         warrant = re.search(r'warrants.{0,100}purchase.{0,60}?(\d[\d,]*)\s+shares.{0,140}exercise price of\s*\$\s*(\d+(?:\.\d+)?)', t, re.I)
         if warrant:
             terms['new_warrant_shares'] = int(warrant.group(1).replace(',', ''))
             terms['new_warrant_exercise_price_usd'] = float(warrant.group(2))
             terms['warrant_reconciliation_required'] = True
-        structural = bool(warrant)
+        structural = bool(warrant or closed_debt_equity_exchange(t))
+        if closed_debt_equity_exchange(t):
+            terms['capital_structure_action'] = 'DEBT_EQUITY_EXCHANGE'
         for sentence in re.split(r'(?<=[.;])\s+', t):
             if re.search(r'\bif\b|\bunless\b|\bmay\b|\bwould\b|\bnot\b', sentence, re.I):
                 continue
@@ -134,6 +153,8 @@ def event_status(text, kind, proof):
     if kind == 'TERMINAL_MERGER': return 'TERMINAL'
     if kind == 'MERGER_TERMINATED': return 'CANCELLED'
     if kind == 'LIQUIDATION_DISTRIBUTION': return 'LIQUIDATING'
+    if kind == 'LISTING_CAPITAL_STRUCTURE' and adopted_rights_plan(operative_text(text)): return 'ADOPTED'
+    if kind == 'LISTING_CAPITAL_STRUCTURE' and resale_registration(operative_text(text)): return 'REGISTERED'
     if proof <= 1: return 'PRELIMINARY' if proof else 'UNKNOWN'
     return 'COMPLETED' if proof >= 3 else 'SIGNED'
 

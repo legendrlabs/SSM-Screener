@@ -14,6 +14,7 @@ def _active_common(c):
 
 def _terms(c):
     t=c.event_terms; parts=[]
+    if t.get('capital_structure_action') == 'DEBT_EQUITY_EXCHANGE': parts.append('Debt exchanged for common stock; incremental shares require reconciliation')
     if t.get('consideration_type') == 'STOCK':
         parts.append('Stock consideration')
         if 'legacy_holder_ownership_pct' in t: parts.append(f"Legacy holders: approximately {t['legacy_holder_ownership_pct']:g}%")
@@ -70,6 +71,7 @@ def write_outputs(candidates,cfg,out_dir):
     md=["# Special Situation Microcap — latest","",f"**SAFE_TO_ACT: {'TRUE' if safe else 'FALSE'}**",""]
     material=[c for c in candidates if _active_common(c) and (
         c.event_type in {'MERGER_CASH_CVR','REVERSE_MERGER_CVR','MERGER_REVERSE_MERGER','LIQUIDATION_DISTRIBUTION'} or
+        (c.event_type == 'DEBT_RESTRUCTURING' and c.event_terms.get('materiality') == 'STRUCTURAL') or
         c.dilution.pending_stock_consideration_usd is not None or
         any(k in c.event_terms for k in ('new_warrant_shares','sale_price_estimate_usd','repurchase_total_usd')))]
     if material:

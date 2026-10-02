@@ -84,7 +84,6 @@ AMOD,4966818.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + heuristic filing
 BCDA,15138782.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 INSG,16420592.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 ROC,19080127.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
-COLA,4494439.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + EX-10.1 exhibit parser + EX-10.2 exhibit parser + EX-10.3 exhibit parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 AOUT,12621225.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 MGRX,21567422.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 GWH,32970025.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
@@ -150,7 +149,7 @@ C-PR,,,,,,,,,,,Excluded: capital metrics are not applicable
 NCI,,,,,,,,,,,Excluded: capital metrics are not applicable
 AEHL,,,,,,,,,,,Excluded: capital metrics are not applicable
 MEGL,,,,,,,,,,,Excluded: capital metrics are not applicable
-GIPR,1861303.0,,,,2005900,2469230,2026-06-30,0.0,0.0,low,heuristic filing-text parser + EX-99.1 exhibit parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
+GIPR,1861303.0,,,,2005900.0,2469230.0,2026-06-30,0.0,0.0,low,heuristic filing-text parser + EX-99.1 exhibit parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 RNAZ,16930739.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 ADC,124379310.0,,,,,,,0.0,0.0,low,SEC companyfacts metadata precheck
 PECO,128700000.0,,,,,,,0.0,0.0,low,SEC companyfacts metadata precheck
@@ -252,6 +251,7 @@ OBAI,29975526.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pas
 RENT,33774121.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 SRFM,100396873.0,,,,,,,30000000.0,0.26443724674972413,low,heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 QTTB,29769466.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
+COLA,,,,,,,,,,,Excluded: capital metrics are not applicable
 CNSY,7589625.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 COLAR,,,,,,,,,,,Excluded: capital metrics are not applicable
 COLAU,,,,,,,,,,,Excluded: capital metrics are not applicable

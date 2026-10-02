@@ -6,7 +6,7 @@
 
 - **ELME** — LIQUIDATION_DISTRIBUTION / LIQUIDATING / WATCH. Distribution: $1.74/share (DECLARED); record_date: 2026-10-09; payment_date: 2026-10-22; ex_dividend_date: 2026-10-23; last_trading_date: 2026-11-05 (planned); dissolution_date: 2026-11-06 (planned); Due bills apply; record date alone does not establish distribution entitlement.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/104894/000010489426000117/elme-20260928.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/104894/000010489426000117/elme-pressreleaseseptember.htm)
-- **FLOC** — ASSET_SALE_ACQUISITION / COMPLETED / DATA_HOLD. Sale price estimate: $159.0M.
+- **FLOC** — ASSET_SALE_ACQUISITION / COMPLETED / DATA_HOLD. Purchase price: C$159.0M cash (~US$113.0M, issuer disclosed); Earnout: up to C$10.0M (contingent).
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2035149/000119312526411196/floc-20261002.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/2035149/000119312526411196/floc-ex99_1.htm), [SEC 3](https://www.sec.gov/Archives/edgar/data/2035149/000119312526411196/floc-ex99_2.htm)
 - **KLXE** — DEBT_RESTRUCTURING / COMPLETED / DATA_HOLD. Debt exchanged for common stock; incremental shares require reconciliation; Rights offering: 24,975,001 common shares at $1.49; gross proceeds $37.2M; Backstop exchange: 59,273,445 common shares to be issued; Expected notes principal reduction: $94.0M, combining exchange and par redemptions; Expected post-transaction issued common shares: 105,677,168; requires reconciliation and is not the current FD share count.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1738827/000173882726000058/klxe-20260929.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/1738827/000173882726000058/klx-pressreleaserightsoffe.htm)
@@ -30,8 +30,6 @@
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1162194/000114036126038110/ef20082995_8k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/1162194/000114036126038110/ef20082995_ex99-1.htm)
 - **PUSA** — MERGER_REVERSE_MERGER / COMPLETED / DATA_HOLD. New common shares issued, as reported: 134,600,000; Replacement options, as reported: 21,800,000; Replacement warrants, as reported: 28,600,000; Reported capital counts require reconciliation; computed FD economics remain unavailable.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2009312/000149315226045385/form8-k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/2009312/000149315226045385/ex99-1.htm), [SEC 3](https://www.sec.gov/Archives/edgar/data/2009312/000149315226045385/ex99-2.htm)
-- **COLA** — MERGER_REVERSE_MERGER / SIGNED / DATA_HOLD. Merger Reverse Merger.
-  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2028201/000121390026106080/ea0307412-8k425_columbus.htm)
 - **VIP** — DEBT_RESTRUCTURING / SIGNED / DATA_HOLD. New warrants: 1,000,000 shares at $1.87; reconcile with outstanding baseline.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1844971/000162828026063839/gree-20260923.htm)
 - **VRME** — MERGER_REVERSE_MERGER / COMPLETED / DATA_HOLD. Post-merger common shares, as reported: 13,407,360; Post-merger fully diluted shares, as reported: 16,048,110; Reported share quantities reflect the reverse split; Reported capital counts require reconciliation; computed FD economics remain unavailable; Post-merger ticker: OPNW.
@@ -63,36 +61,37 @@
 
 ## B/C — WATCH
 
-- **ELME** — B_WATCH, LIQUIDATION_DISTRIBUTION / LIQUIDATING, score 59. Liquidation in progress; distribution entitlement, due bills and terminal dates require review.
+- **ELME** — B_WATCH, LIQUIDATION_DISTRIBUTION / LIQUIDATING, score 59.0. Liquidation in progress; distribution entitlement, due bills and terminal dates require review.
 
 ## DATA HOLD
 
-- **BBGI** — DATA_HOLD, STRATEGIC_INVESTMENT_PIPE / COMPLETED, score 57. Unresolved share quantity for ordinary warrants.; Material dilution language found but no reliable share quantity extracted.; New event warrant tranche requires reconciliation against the outstanding financial baseline.
-- **BSEM** — DATA_HOLD, STRATEGIC_INVESTMENT_PIPE / COMPLETED, score 57. Interim capital event 0001193125-26-395556: Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for pre-funded warrants.; Unresolved share quantity for convertible debt.
-- **FLOC** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 56. Unresolved incremental share obligations for merger consideration or earnout.; Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.
-- **ACCV** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 56. Latest 10-Q/10-K primary document unavailable.; Common shares outstanding not resolved.
-- **SXC** — DATA_HOLD, OTHER / COMPLETED, score 52. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Cap table confidence is low.
-- **KLXE** — DATA_HOLD, DEBT_RESTRUCTURING / COMPLETED, score 50. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Unresolved share quantity for ordinary warrants.
-- **INGN** — DATA_HOLD, ASSET_SALE_ACQUISITION / SIGNED, score 50. Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Cap table confidence is low.
-- **CBNK** — DATA_HOLD, MERGER_STOCK / SIGNED, score 50. Unresolved incremental share obligations for merger consideration or earnout.; Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Material dilution language found but no reliable share quantity extracted.
-- **THRMV** — DATA_HOLD, ASSET_SALE_ACQUISITION / UNKNOWN, score 49. Listed security type is not verified from SEC registered classes.
-- **DBRG** — DATA_HOLD, ASSET_SALE_ACQUISITION / UNKNOWN, score 49. Listed security type is not verified from SEC registered classes.
+- **BBGI** — DATA_HOLD, STRATEGIC_INVESTMENT_PIPE / COMPLETED, score 57.0. Unresolved share quantity for ordinary warrants.; Material dilution language found but no reliable share quantity extracted.; New event warrant tranche requires reconciliation against the outstanding financial baseline.
+- **BSEM** — DATA_HOLD, STRATEGIC_INVESTMENT_PIPE / COMPLETED, score 57.0. Interim capital event 0001193125-26-395556: Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for pre-funded warrants.; Unresolved share quantity for convertible debt.
+- **FLOC** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 56.0. Unresolved incremental share obligations for merger consideration or earnout.; Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.
+- **ACCV** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 56.0. Latest 10-Q/10-K primary document unavailable.; Common shares outstanding not resolved.
+- **SXC** — DATA_HOLD, OTHER / COMPLETED, score 52.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Cap table confidence is low.
+- **KLXE** — DATA_HOLD, DEBT_RESTRUCTURING / COMPLETED, score 50.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Unresolved share quantity for ordinary warrants.
+- **INGN** — DATA_HOLD, ASSET_SALE_ACQUISITION / SIGNED, score 50.0. Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Cap table confidence is low.
+- **CBNK** — DATA_HOLD, MERGER_STOCK / SIGNED, score 50.0. Unresolved incremental share obligations for merger consideration or earnout.; Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Material dilution language found but no reliable share quantity extracted.
+- **THRMV** — DATA_HOLD, ASSET_SALE_ACQUISITION / UNKNOWN, score 49.0. Listed security type is not verified from SEC registered classes.
+- **DBRG** — DATA_HOLD, ASSET_SALE_ACQUISITION / UNKNOWN, score 49.0. Listed security type is not verified from SEC registered classes.
 
 ## REJECT
 
-- **CTRE** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **MOD** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **THRM** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **HTO** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **LQDT** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **NFG** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **CNP** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **GRND** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **CSV** — REJECT, DEBT_RESTRUCTURING / COMPLETED, score 43. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Unresolved share quantity for preferred shares.
-- **NTST** — REJECT, FINANCING_DEBT / UNKNOWN, score 34. Market cap above expanded universe ceiling; filing body skipped.
+- **CTRE** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **MOD** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **THRM** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **HTO** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **LQDT** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **NFG** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **CNP** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **GRND** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **CSV** — REJECT, DEBT_RESTRUCTURING / COMPLETED, score 43.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Unresolved share quantity for preferred shares.
+- **NTST** — REJECT, FINANCING_DEBT / UNKNOWN, score 34.0. Market cap above expanded universe ceiling; filing body skipped.
 
-## EXCLUDED — 58 securities
+## EXCLUDED — 59 securities
 
+- **COLA** — COMMON_EQUITY / TERMINAL. Event status TERMINAL; excluded from active research candidates.
 - **COLAR** — UNIT_OR_RIGHT / SIGNED. UNIT_OR_RIGHT security is outside the common-equity universe.
 - **COLAU** — UNIT_OR_RIGHT / SIGNED. UNIT_OR_RIGHT security is outside the common-equity universe.
 - **NWS** — COMMON_EQUITY / UNKNOWN. Common shares resolved from latest 10-Q/10-K cover page.; Material dilution language found but no reliable share quantity extracted.
@@ -112,4 +111,7 @@
 - **RWAYI** — DEBT / PRELIMINARY. DEBT security is outside the common-equity universe.
 - **RWAYL** — DEBT / PRELIMINARY. DEBT security is outside the common-equity universe.
 - **EDBLW** — WARRANT / SIGNED. WARRANT security is outside the common-equity universe.
-- **LPBBU** — WARRANT / SIGNED. WARRANT security is outside the common-equity universe.
+
+## Validation scope
+
+FLOC and COLA were refreshed against current SEC event sources. The other 335 rows retain the prior 337-row scan; financial and market inputs were not rescanned. FLOC remains DATA_HOLD. The retired COLA common listing is EXCLUDED. SAFE_TO_ACT remains FALSE.

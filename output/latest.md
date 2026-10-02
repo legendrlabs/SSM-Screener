@@ -24,18 +24,20 @@
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2137679/000182912626010594/oceanlightacq_8k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/2137679/000182912626010594/oceanlightacq_ex99-1.htm)
 - **LAB** — ASSET_SALE_ACQUISITION / SIGNED / DATA_HOLD. Sale price estimate: $5.5M.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1162194/000114036126038110/ef20082995_8k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/1162194/000114036126038110/ef20082995_ex99-1.htm)
+- **PUSA** — MERGER_REVERSE_MERGER / COMPLETED / DATA_HOLD. New common shares issued, as reported: 134,600,000; Replacement options, as reported: 21,800,000; Replacement warrants, as reported: 28,600,000; Reported capital counts require reconciliation; computed FD economics remain unavailable.
+  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2009312/000149315226045385/form8-k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/2009312/000149315226045385/ex99-1.htm), [SEC 3](https://www.sec.gov/Archives/edgar/data/2009312/000149315226045385/ex99-2.htm)
 - **APUR** — MERGER_REVERSE_MERGER / SIGNED / DATA_HOLD. Merger Reverse Merger.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2093524/000121390026100601/ea0305349-8k425_aperture.htm)
 - **VIP** — DEBT_RESTRUCTURING / SIGNED / DATA_HOLD. New warrants: 1,000,000 shares at $1.87; reconcile with outstanding baseline.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1844971/000162828026063839/gree-20260923.htm)
 - **GPRO** — MERGER_CASH_STOCK / SIGNED / DATA_HOLD. Cash at closing: $1.14/share; Stock at closing: 0.1 shares of Surviving corporation common stock per existing common share; Cash is subject to downward adjustment for a net working capital shortfall; the stated amount is not a guaranteed floor.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1500435/000162828026060181/gpro-20260901.htm)
+- **VRME** — MERGER_REVERSE_MERGER / COMPLETED / DATA_HOLD. Post-merger common shares, as reported: 13,407,360; Post-merger fully diluted shares, as reported: 16,048,110; Reported share quantities reflect the reverse split; Reported capital counts require reconciliation; computed FD economics remain unavailable; Post-merger ticker: OPNW.
+  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1104038/000121465926012283/w92926108k.htm)
 - **ALLR** — MERGER_REVERSE_MERGER / PRELIMINARY / DATA_HOLD. Merger Reverse Merger.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1860657/000121390026099576/ea0305408-8k_allarity.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/1860657/000121390026099576/ea030540801ex99-1.htm)
-- **SMTI** — MERGER_REVERSE_MERGER / UNKNOWN / DATA_HOLD. Merger Reverse Merger.
-  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/714256/000121390026105390/ea0307287-8k_sanara.htm)
-- **PUSA** — MERGER_REVERSE_MERGER / PRELIMINARY / DATA_HOLD. Merger Reverse Merger.
-  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2009312/000149315226038731/form8-k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/2009312/000149315226038731/ex99-1.htm)
+- **SMTI** — MERGER_CASH_STOCK / UNKNOWN / DATA_HOLD. Cash at closing: $33.00/share; Stock at closing: 0.4735 shares of MDXG per existing common share; Consideration retained from the 2026-07-29 same-counterparty agreement; latest regulatory update retained.
+  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/714256/000121390026105390/ea0307287-8k_sanara.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/714256/000149315226035196/form8-k.htm), [SEC 3](https://www.sec.gov/Archives/edgar/data/714256/000149315226035196/ex99-1.htm)
 - **LPBB** — MERGER_REVERSE_MERGER / SIGNED / DATA_HOLD. Merger Reverse Merger.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2023676/000121390026105744/ea0307246-8k_launch.htm)
 - **XRPN** — MERGER_REVERSE_MERGER / PRELIMINARY / DATA_HOLD. Merger Reverse Merger.
@@ -50,8 +52,6 @@
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2083125/000121390026105491/ea030717602-424b3_presidio.htm)
 - **ADGM** — MERGER_REVERSE_MERGER / PRELIMINARY / DATA_HOLD. Merger Reverse Merger.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2006986/000110465926109821/adgm-20260923x8k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/2006986/000110465926109821/adgm-20260923xex99.htm)
-- **VRME** — MERGER_REVERSE_MERGER / UNKNOWN / DATA_HOLD. Merger Reverse Merger.
-  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1104038/000121465926011962/p9242628k.htm)
 ## NO CANDIDATE
 
 
@@ -66,8 +66,8 @@
 - **ACCV** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 56.0. Latest 10-Q/10-K primary document unavailable.; Common shares outstanding not resolved.
 - **SXC** — DATA_HOLD, OTHER / COMPLETED, score 52.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Cap table confidence is low.
 - **INGN** — DATA_HOLD, ASSET_SALE_ACQUISITION / SIGNED, score 50.0. Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Cap table confidence is low.
-- **CBNK** — DATA_HOLD, MERGER_STOCK / SIGNED, score 50. Unresolved incremental share obligations for merger consideration or earnout.; Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Material dilution language found but no reliable share quantity extracted.
-- **KLXE** — DATA_HOLD, DEBT_RESTRUCTURING / COMPLETED, score 50. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Unresolved share quantity for ordinary warrants.
+- **CBNK** — DATA_HOLD, MERGER_STOCK / SIGNED, score 50.0. Unresolved incremental share obligations for merger consideration or earnout.; Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Material dilution language found but no reliable share quantity extracted.
+- **KLXE** — DATA_HOLD, DEBT_RESTRUCTURING / COMPLETED, score 50.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Unresolved share quantity for ordinary warrants.
 - **THRMV** — DATA_HOLD, ASSET_SALE_ACQUISITION / UNKNOWN, score 49.0. Listed security type is not verified from SEC registered classes.
 - **DBRG** — DATA_HOLD, ASSET_SALE_ACQUISITION / UNKNOWN, score 49.0. Listed security type is not verified from SEC registered classes.
 - **DBRG-PH** — DATA_HOLD, ASSET_SALE_ACQUISITION / UNKNOWN, score 49.0. Listed security type is not verified from SEC registered classes.
@@ -108,6 +108,6 @@
 - **KITTW** — WARRANT / SIGNED. WARRANT security is outside the common-equity universe.
 - **NSTS** — COMMON_EQUITY / TERMINAL. Event status TERMINAL; excluded from active research candidates.
 
-## Snapshot provenance
+## Stabilization validation scope
 
-Completed 320-row scan retained. Every existing merger row (33 securities, including excluded related classes) and KLXE was re-evaluated from its selected SEC filing sources using the current rules. Other issuer discovery, financial and market inputs are retained; this is not a new full-universe scan. Market prices retain the October 1 closing snapshot.
+Known material issues were tested under the v1 stabilization policy. PUSA, SMTI and VRME were refreshed through their latest SEC event and financial pipelines. The other 317 rows retain the previous scan; this is not a fresh full-universe scan. October 1 market inputs are retained where applicable. Old VRME market values are suppressed pending OPNW and post-split capital reconciliation. Reported closing capital counts are source disclosures, not independently reconciled FD estimates. SMTI retains its original same-counterparty cash and stock terms alongside the latest regulatory update; UNKNOWN is a pending-stage detail, not evidence of closing.

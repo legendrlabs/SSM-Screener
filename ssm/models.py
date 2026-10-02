@@ -15,6 +15,10 @@ class Dilution:
     sbc_rsus_shares: float = 0.0
     atm_remaining_usd: float = 0.0
     warrant_exercise_cash_usd: float = 0.0
+    pre_funded_warrants_outstanding: Optional[float] = None
+    ordinary_warrants_outstanding: Optional[float] = None
+    warrant_units_as_of: Optional[str] = None
+    pending_stock_consideration_usd: Optional[float] = None
     source: str = ""
     confidence: str = "low"
 
@@ -30,7 +34,7 @@ class Dilution:
 
     @property
     def fd_ratio(self) -> Optional[float]:
-        return self.strict_fd_shares / self.common_shares if self.common_shares > 0 else None
+        return self.strict_fd_shares / self.common_shares if self.common_shares > 0 and self.confidence != 'low' else None
 
 @dataclass
 class Candidate:
@@ -38,6 +42,16 @@ class Candidate:
     name: str = ""
     exchange: str = ""
     cik: str = ""
+    security_type: str = 'COMMON_EQUITY'
+    security_title: str = ''
+    security_source: str = ''
+    event_status: str = 'UNKNOWN'
+    event_terms: Dict = field(default_factory=dict)
+    event_sources: List[str] = field(default_factory=list)
+    event_history: List[Dict] = field(default_factory=list)
+    event_review_complete: bool = True
+    event_selection_reason: str = ''
+    most_recent_filing_date: Optional[str] = None
     price: Optional[float] = None
     price_as_of: Optional[str] = None
     adv20_usd: Optional[float] = None
@@ -45,6 +59,14 @@ class Candidate:
     return_5d_pct: Optional[float] = None
     public_float: Optional[float] = None
     latest_financial_filing_date: Optional[str] = None
+    latest_financial_form: Optional[str] = None
+    latest_financial_accession: Optional[str] = None
+    financial_review_complete: bool = False
+    financial_note_hits: List[str] = field(default_factory=list)
+    common_shares_source: str = ""
+    share_count_conflict: bool = False
+    exhibit_review_complete: bool = False
+    exhibit_documents_reviewed: List[str] = field(default_factory=list)
     latest_event_date: Optional[str] = None
     latest_event_form: Optional[str] = None
     latest_event_accession: Optional[str] = None
@@ -66,12 +88,19 @@ class Candidate:
     bucket: str = "DATA_HOLD"
 
     def basic_market_cap(self):
+        if self.event_terms.get('capital_counts_require_reconciliation'): return None
+        if self.event_terms.get('post_transaction_ticker', self.ticker) != self.ticker: return None
+        if self.security_type != 'COMMON_EQUITY' or self.event_status in {'TERMINAL', 'CANCELLED'} or self.gate_status == 'EXCLUDED': return None
         return self.price * self.dilution.common_shares if self.price is not None and self.dilution.common_shares > 0 else None
 
     def near_fd_market_cap(self):
+        if self.basic_market_cap() is None: return None
+        if self.dilution.confidence == 'low': return None
         return self.price * self.dilution.near_fd_shares if self.price is not None and self.dilution.near_fd_shares > 0 else None
 
     def strict_fd_market_cap(self):
+        if self.basic_market_cap() is None: return None
+        if self.dilution.confidence == 'low': return None
         return self.price * self.dilution.strict_fd_shares if self.price is not None and self.dilution.strict_fd_shares > 0 else None
 
     def nav_coverage(self):
@@ -92,6 +121,6 @@ class Candidate:
             "strict_fd_market_cap": self.strict_fd_market_cap(),
             "nav_coverage": self.nav_coverage(),
             "atm_ratio": self.atm_ratio(),
-            "fd_ratio": self.dilution.fd_ratio,
+            "fd_ratio": None if self.event_terms.get('capital_counts_require_reconciliation') else self.dilution.fd_ratio,
         })
         return d

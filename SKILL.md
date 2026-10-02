@@ -60,6 +60,20 @@ Always attempt to produce:
 
 If cap-table confidence is low, do not guess; emit `DATA_HOLD`.
 
+## SEC discovery modes
+
+- `atom`: use on GitHub-hosted/public environments; discover filings via the official SEC Atom feed, then verify with submissions/companyfacts and the primary filing document.
+- `daily-index`: use on local/self-hosted environments when EDGAR master-index access is available.
+- `auto`: try daily-index first and fall back to Atom on HTTP 403.
+
+The evidence standard is unchanged. If filing text or dilution terms cannot be verified, keep the candidate at `DATA_HOLD`.
+
+## 10-Q/10-K second pass
+
+Event discovery does not replace financial review. For each candidate, resolve and read the latest 10-Q or 10-K primary document and inspect warrants, pre-funded warrants, converts, preferreds, ATM/equity lines, SBC/RSUs, going concern, related-party items, subsequent events, debt and equity notes.
+
+If the latest 10-Q/10-K body cannot be reviewed, keep the candidate at `DATA_HOLD`. When the same instrument appears in both the event filing and the financial filing, do not blindly add the share equivalents; use conservative non-duplicative reconciliation.
+
 ## Runtime output order
 
 When generated output files exist, read:

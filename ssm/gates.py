@@ -13,6 +13,10 @@ def evaluate_gates(c: Candidate, cfg):
     if c.event_status in {'TERMINAL', 'CANCELLED'}: return 'EXCLUDED', [f'Event status {c.event_status}; excluded from active research candidates.']
     if c.security_type == 'UNKNOWN': return 'DATA_HOLD', ['Listed security type is not verified from SEC registered classes.']
     if not c.event_review_complete: return 'DATA_HOLD', ['Material event review is incomplete.']
+    if c.event_type == 'MERGER_CVR_UNVERIFIED': return 'DATA_HOLD', ['Merger consideration structure is unverified; CVR alone does not establish cash consideration.']
+    if c.event_type == 'DEBT_RESTRUCTURING':
+        if c.event_terms.get('materiality') == 'ROUTINE': return 'REJECT', ['Routine credit amendment without a verified structural special-situation catalyst.']
+        if c.event_terms.get('materiality') != 'STRUCTURAL': return 'DATA_HOLD', ['Structural debt catalyst materiality is unverified.']
     if c.exchange not in cfg["exchanges"]: return "REJECT", [f"Exchange {c.exchange!r} outside allowed universe."]
     if c.price is None or c.price <= 0: return "DATA_HOLD", ["Missing/stale market price."]
     if c.dilution.common_shares <= 0: return "DATA_HOLD", ["Common shares outstanding not resolved."]

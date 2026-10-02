@@ -5,7 +5,7 @@ import re
 from .event_rules import classify_event, operative_text
 
 PRIORITY = {'TERMINAL_MERGER': 110, 'MERGER_TERMINATED': 105,
-            'LIQUIDATION_DISTRIBUTION': 100, 'MERGER_CASH_CVR': 90,
+            'LIQUIDATION_DISTRIBUTION': 100, 'MERGER_CASH_CVR': 90, 'REVERSE_MERGER_CVR': 90, 'MERGER_CVR_UNVERIFIED': 85,
             'MERGER_REVERSE_MERGER': 85, 'ASSET_SALE_ACQUISITION': 70,
             'STRATEGIC_INVESTMENT_PIPE': 65, 'DEBT_RESTRUCTURING': 60,
             'LARGE_CONTRACT': 50, 'BUSINESS_PIVOT': 45,
@@ -16,7 +16,7 @@ MONTH_DATE = r'([A-Z][a-z]+\s+\d{1,2},\s*20\d{2})'
 def select_event(reviewed):
     if not reviewed:
         return None
-    latest_merger = max((x.get('filed', '') for x in reviewed if x['event_type'] in {'MERGER_CASH_CVR', 'MERGER_REVERSE_MERGER'}), default='')
+    latest_merger = max((x.get('filed', '') for x in reviewed if x['event_type'] in {'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR', 'MERGER_CVR_UNVERIFIED', 'MERGER_REVERSE_MERGER'}), default='')
     eligible = [x for x in reviewed if not (x['event_type'] == 'MERGER_TERMINATED' and x.get('filed', '') < latest_merger)]
     # Retain active merger/liquidation lifecycles through routine filings.
     # Other transactions use recency; an old asset deal cannot hide refinancing.
@@ -34,22 +34,35 @@ def _date_after(text, anchor, distance=180):
         return None
 
 
-def event_terms(text, kind):
-    t = operative_text(text)
+def event_terms(text, kind, *, cleaned=False):
+    t = text if cleaned else operative_text(text)
     terms = {}
-    if kind in {'MERGER_CASH_CVR', 'MERGER_REVERSE_MERGER', 'TERMINAL_MERGER'}:
+    if kind in {'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR', 'MERGER_CVR_UNVERIFIED', 'MERGER_REVERSE_MERGER', 'TERMINAL_MERGER'}:
         cash = re.search(r'\$\s*(\d+(?:\.\d+)?)\s+per share.{0,45}?in cash', t, re.I)
         if not cash:
             cash = re.search(r'converted into.{0,100}?\$\s*(\d+(?:\.\d+)?)\s+(?:cash|per share)', t, re.I)
-        if cash:
+        if cash and kind != 'REVERSE_MERGER_CVR':
             terms['cash_per_share_usd'] = float(cash.group(1))
-        if kind == 'MERGER_CASH_CVR':
+        if kind in {'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR', 'MERGER_CVR_UNVERIFIED'}:
             terms['cvr_conditional'] = True
             if re.search(r'non[- ]tradable|non[- ]transferable', t, re.I):
                 terms['cvr_transferable'] = False
             illustrative = re.search(r'aggregate potential merger consideration (?:of|is)\s*\$\s*(\d+(?:\.\d+)?)\s+per share', t, re.I)
-            if illustrative and re.search(r'assuming full|illustration', t, re.I):
+            if kind == 'MERGER_CASH_CVR' and illustrative and re.search(r'assuming full|illustration', t, re.I):
                 terms['illustrative_total_per_share_usd'] = float(illustrative.group(1))
+        if kind == 'REVERSE_MERGER_CVR':
+            terms['consideration_type'] = 'STOCK'
+            for key, pattern in [('legacy_holder_ownership_pct', r'pre[- ]merger (?:company|parent) stockholders.{0,180}?approximately\s*([\d.]+)%'),
+                                 ('target_and_financing_ownership_pct', r'stockholders\s*\(inclusive of investors in the private placement\).{0,180}?approximately\s*([\d.]+)%')]:
+                ownership = re.search(pattern, t, re.I)
+                if ownership:
+                    terms[key] = float(ownership.group(1))
+            terms['ownership_illustrative'] = True
+            terms['ownership_subject_to_closing_adjustments'] = True
+            if re.search(r'net proceeds|monetization', t, re.I):
+                terms['cvr_basis'] = 'Legacy asset monetization net proceeds'
+            if re.search(r'may declare', t, re.I):
+                terms['cvr_distribution_status'] = 'CONTEMPLATED'
     if kind == 'LIQUIDATION_DISTRIBUTION':
         distribution = re.search(r'\$\s*(\d+(?:\.\d+)?)\s+per (?:common )?share.{0,70}(?:liquidating|liquidation|distribution)', t, re.I)
         if not distribution:
@@ -86,6 +99,19 @@ def event_terms(text, kind):
             terms['new_warrant_shares'] = int(warrant.group(1).replace(',', ''))
             terms['new_warrant_exercise_price_usd'] = float(warrant.group(2))
             terms['warrant_reconciliation_required'] = True
+        structural = bool(warrant)
+        for sentence in re.split(r'(?<=[.;])\s+', t):
+            if re.search(r'\bif\b|\bunless\b|\bmay\b|\bwould\b|\bnot\b', sentence, re.I):
+                continue
+            if re.search(r'(?:debt|notes).{0,80}(?:were|was|has been|have been) converted into.{0,50}(?:equity|common stock)|(?:exchanged|converted).{0,100}(?:debt|notes).{0,100}(?:equity|common stock)|(?:creditors|lenders).{0,60}(?:forgave|forgiven).{0,60}(?:debt|notes)|(?:cured|resolved).{0,40}(?:payment default|actual default)', sentence, re.I):
+                structural = True
+        routine = bool(re.search(r'amend|amends and restates', t, re.I) and re.search(r'credit(?: and security)? agreement|loan agreement', t, re.I))
+        terms['materiality'] = 'STRUCTURAL' if structural else 'ROUTINE' if routine else 'UNVERIFIED'
+        commitments = re.search(r'(?:revolving commitments|commitments).{0,60}from\s*\$\s*([\d.]+)\s*million\s+to\s*\$\s*([\d.]+)\s*million', t, re.I)
+        if commitments:
+            terms['revolving_commitment_before_usd'] = float(commitments.group(1)) * 1e6
+            terms['revolving_commitment_after_usd'] = float(commitments.group(2)) * 1e6
+            terms['commitment_change_is_debt_reduction'] = False
     if kind == 'ASSET_SALE_ACQUISITION':
         amount = re.search(r'aggregate purchase price.{0,70}?\$\s*([\d.]+)\s*million', t, re.I)
         if amount:
@@ -131,24 +157,21 @@ def review_material_events(sec, cik, discovered, cfg):
             primary = sec.submission_text(filing['filename'])
             sources = ['https://www.sec.gov/Archives/' + filing['filename']]
             text = primary
+            narratives = [operative_text(primary)]
             if filing.get('form') == '8-K' and re.search(r'Exhibit\s+99\.|99\.\d', primary, re.I):
                 # Incorporated press releases own economic terms. Select them
                 # by type; a pile of EX-10 documents cannot crowd them out.
                 for doc in sec.filing_documents(cik, filing.get('accession'), filing.get('index_url')):
                     if doc['type'].startswith('EX-99'):
-                        text += '\n' + sec.submission_text(doc['url'])
+                        exhibit = sec.submission_text(doc['url'])
+                        text += '\n' + exhibit
+                        narratives.append(operative_text(exhibit))
                         sources.append(doc['url'])
-            label, proof, summary = classify_event(text)
-            # Classify the operative primary first, but use the press release
-            # for stronger transaction facts/terms when the primary is generic.
-            press = text[len(primary):]
-            if press:
-                ex_label, ex_proof, ex_summary = classify_event(press)
-                if PRIORITY.get(ex_label, 10) > PRIORITY.get(label, 10):
-                    label, proof, summary = ex_label, max(proof, ex_proof), ex_summary
-            terms = event_terms(primary, label)
-            if press:
-                terms.update(event_terms(press, label))
+            # Clean each document before joining; one document's Item 9 or
+            # cautionary section must not hide another's consideration terms.
+            narrative = '\n'.join(narratives)
+            label, proof, summary = classify_event(narrative, cleaned=True)
+            terms = event_terms(narrative, label, cleaned=True)
             reviewed.append({**filing, 'event_type': label, 'event_proof': proof,
                              'event_status': event_status(text, label, proof), 'summary': summary,
                              'terms': terms,

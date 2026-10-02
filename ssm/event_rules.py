@@ -23,8 +23,29 @@ EVENT_KEYWORDS = {
     "LISTING_CAPITAL_STRUCTURE": [r"\breverse stock split\b", r"\bminimum bid price\b", r"\bnasdaq deficiency\b", r"\bwarrant inducement\b"]
 }
 
-def classify_event(text: str) -> Tuple[str, int, str]:
-    t = operative_text(text).lower()
+def current_liquidation(t):
+    for sentence in re.split(r'(?<=[.;])\s+', t):
+        if not re.search(r'liquidat|dissol', sentence):
+            continue
+        if re.search(r'\bif\b|\bunless\b|\bmay approve\b|\bnot\s+(?:yet\s+)?(?:approved|adopted|declared|commenced)|articles.{0,80}provide', sentence):
+            continue
+        if re.search(r'approved|adopted|declared|commenced|undertaking|in progress|winding up', sentence):
+            return True
+    return False
+
+
+def merger_consideration(t):
+    # Financing proceeds and fractional-share cash are not cash merger prices.
+    if re.search(r'all[- ]stock|stock[- ]for[- ]stock', t):
+        return 'STOCK'
+    if re.search(r'\$\s*\d+(?:\.\d+)?\s+(?:per share.{0,45}?in cash|in cash.{0,45}?per share)', t) or re.search(r'(?:shareholders|stockholders).{0,100}receive\s*\$\s*\d+(?:\.\d+)?\s+in cash', t):
+        return 'CASH'
+    if re.search(r'exchange ratio|converted into.{0,80}(?:shares of common stock|ordinary shares)', t):
+        return 'STOCK'
+    return 'UNVERIFIED'
+
+def classify_event(text: str, *, cleaned=False) -> Tuple[str, int, str]:
+    t = (text if cleaned else operative_text(text)).lower()
     terminal = bool(re.search(r'(?:separate existence.{0,60}ceased|ceased to exist as a separate entity)', t)
                     and re.search(r'converted into.{0,140}(?:cash|\$)|no longer.{0,50}(?:listed|traded)', t))
     anchor = None
@@ -32,11 +53,13 @@ def classify_event(text: str) -> Tuple[str, int, str]:
         anchor = 'TERMINAL_MERGER'
     elif re.search(r'(?:has |have |company |parties )terminated.{0,40}(?:merger|business combination) agreement|(?:merger|business combination) agreement (?:was|has been) terminated', t[:2500]):
         anchor = 'MERGER_TERMINATED'
-    elif re.search(r'liquidating distribution|liquidation activities|plan of sale and liquidation', t):
+    elif current_liquidation(t):
         anchor = 'LIQUIDATION_DISTRIBUTION'
     elif re.search(r'merger agreement|agreement and plan of merger|to be acquired', t) and re.search(r'contingent value right|\bcvr\b', t):
-        anchor = 'MERGER_CASH_CVR'
-    elif re.search(r'(?:entered into|amends and restates|executed).{0,300}(?:credit agreement|loan agreement)', t):
+        anchor = {'STOCK': 'REVERSE_MERGER_CVR', 'CASH': 'MERGER_CASH_CVR', 'UNVERIFIED': 'MERGER_CVR_UNVERIFIED'}[merger_consideration(t)]
+    elif re.search(r'(?:consummated|completed|closed).{0,100}initial public offering', t):
+        anchor = 'IPO_COMPLETED'
+    elif re.search(r'(?:entered into|amends and restates|executed|amended).{0,300}(?:credit(?: and security)? agreement|loan agreement)', t):
         anchor = 'DEBT_RESTRUCTURING'
     elif re.search(r'exchange agreement', t) and re.search(r'senior notes|principal amount|debt', t):
         anchor = 'DEBT_RESTRUCTURING'

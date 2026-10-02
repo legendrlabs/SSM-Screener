@@ -14,6 +14,13 @@ def _active_common(c):
 
 def _terms(c):
     t=c.event_terms; parts=[]
+    if t.get('consideration_type') == 'STOCK':
+        parts.append('Stock consideration')
+        if 'legacy_holder_ownership_pct' in t: parts.append(f"Legacy holders: approximately {t['legacy_holder_ownership_pct']:g}%")
+        if 'target_and_financing_ownership_pct' in t: parts.append(f"Target and financing holders: approximately {t['target_and_financing_ownership_pct']:g}%")
+        parts.append('Pro forma ownership subject to closing adjustments; not a current FD share count')
+    if t.get('cvr_basis'): parts.append(t['cvr_basis'] + '; payment may be zero')
+    if t.get('cvr_distribution_status') == 'CONTEMPLATED': parts.append('CVR distribution contemplated, subject to declaration and closing')
     if 'cash_per_share_usd' in t: parts.append(f"Cash at closing: ${t['cash_per_share_usd']:.2f}/share")
     if t.get('cvr_conditional'):
         parts.append('CVR: contingent; ' + ('non-tradable' if t.get('cvr_transferable') is False else 'transfer terms require review'))
@@ -62,7 +69,7 @@ def write_outputs(candidates,cfg,out_dir):
     top=[c for c in candidates if c.bucket=="A_RESEARCH_NOW"][:cfg["max_candidates"]]; watch=[c for c in candidates if c.bucket in ("B_WATCH","C_SPECULATIVE")][:10]; reject=[c for c in candidates if c.bucket=="REJECT"][:10]; hold=[c for c in candidates if c.bucket=="DATA_HOLD"][:10]
     md=["# Special Situation Microcap — latest","",f"**SAFE_TO_ACT: {'TRUE' if safe else 'FALSE'}**",""]
     material=[c for c in candidates if _active_common(c) and (
-        c.event_type in {'MERGER_CASH_CVR','LIQUIDATION_DISTRIBUTION'} or
+        c.event_type in {'MERGER_CASH_CVR','REVERSE_MERGER_CVR','MERGER_REVERSE_MERGER','LIQUIDATION_DISTRIBUTION'} or
         c.dilution.pending_stock_consideration_usd is not None or
         any(k in c.event_terms for k in ('new_warrant_shares','sale_price_estimate_usd','repurchase_total_usd')))]
     if material:

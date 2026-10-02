@@ -16,7 +16,8 @@ concurrency:
 
 jobs:
   scan:
-    runs-on: ubuntu-slim
+    # The full SEC scan exceeds ubuntu-slim's hard 15-minute job limit.
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
       contents: write

@@ -1,1 +1,2 @@
 Rebuild content snapshot: conditional SPAC liquidation, stock merger CVR, routine credit materiality.
+Retry on the standard Ubuntu runner; slim has a hard 15-minute limit.

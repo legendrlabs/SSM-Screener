@@ -23,6 +23,42 @@ EVENT_KEYWORDS = {
     "LISTING_CAPITAL_STRUCTURE": [r"\breverse stock split\b", r"\bminimum bid price\b", r"\bnasdaq deficiency\b", r"\bwarrant inducement\b"]
 }
 
+MERGER_KINDS = {'MERGER_REVERSE_MERGER', 'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR',
+                'MERGER_CVR_UNVERIFIED', 'MERGER_CASH_STOCK', 'MERGER_STOCK'}
+
+
+def merger_share_consideration(t):
+    """Common-holder exchange terms; cash for awards/fractions is not deal cash."""
+    for clause in re.split(r'(?<=[.;])\s+', t):
+        if not re.search(r'each share|shareholders|stockholders', clause, re.I):
+            continue
+        for exchange in re.finditer(r'(?:converted into (?:the )?right to receive|will receive)\s*(?:\([ivx]+\)\s*)?(\d+(?:\.\d+)?)\s+(?:shares\b|of a.{0,100}?share\b)', clause, re.I):
+            source = clause[:exchange.start()]
+            holders = list(re.finditer(r'\beach share\b|\b(?:common )?(?:shareholders|stockholders)\b', source, re.I))
+            source = source[holders[-1].start():] if holders else source
+            if re.search(r'preferred', source, re.I) or not re.search(r'common stock|common (?:shareholders|stockholders)', source, re.I):
+                continue
+            payout = re.split(r'\beach (?:outstanding |unvested |vested )?(?:option|warrant|award|restricted stock|share of .{0,60}?preferred stock)\b|\bholders of .{0,60}?preferred stock\b', clause[exchange.start():], maxsplit=1, flags=re.I)[0]
+            if not re.search(r'common stock', payout, re.I):
+                continue
+            terms = {'consideration_type': 'STOCK', 'stock_exchange_ratio': float(exchange.group(1))}
+            if re.search(r'common stock of the surviving corporation', payout, re.I):
+                terms['stock_consideration_security'] = 'Surviving corporation common stock'
+            else:
+                owner = re.search(r'common stock.{0,70}?of\s+([A-Za-z]+)', payout, re.I)
+                if owner:
+                    terms['stock_consideration_security'] = owner.group(1).title() + ' common stock'
+                    ticker = re.search(re.escape(owner.group(1)) + r'.{0,80}?\(?(?:NASDAQ|NYSE)\s*:\s*([A-Z]+)', t, re.I)
+                    if ticker:
+                        terms['stock_consideration_ticker'] = ticker.group(1).upper()
+            cash = re.search(r'\$\s*(\d+(?:\.\d+)?)\s+in cash', payout, re.I)
+            if cash and not re.search(r'cash in lieu of fractional', payout[:cash.end()], re.I):
+                terms.update(consideration_type='CASH_AND_STOCK', cash_per_share_usd=float(cash.group(1)))
+                if re.search(r'downward adjustment.{0,100}net working capital shortfall', payout, re.I):
+                    terms.update(cash_adjustment_direction='DOWNWARD', cash_adjustment_basis='NET_WORKING_CAPITAL_SHORTFALL')
+            return terms
+    return {}
+
 def liquidation_evidence(t):
     """Return operative liquidation clauses, not hypothetical security rights."""
     plan = r'(?:plan of (?:sale and )?liquidation|(?:liquidation|dissolution) plan)'
@@ -95,6 +131,10 @@ def classify_event(text: str, *, cleaned=False) -> Tuple[str, int, str]:
         anchor = 'LISTING_CAPITAL_STRUCTURE'
     elif re.search(r'merger agreement|agreement and plan of merger|to be acquired', t) and re.search(r'contingent value right|\bcvr\b', t):
         anchor = {'STOCK': 'REVERSE_MERGER_CVR', 'CASH': 'MERGER_CASH_CVR', 'UNVERIFIED': 'MERGER_CVR_UNVERIFIED'}[merger_consideration(t)]
+    elif (re.search(r'merger agreement|agreement and plan of merger', t)
+          and not re.search(r'\bspac\b|special purpose acquisition|reverse merger', t)
+          and merger_share_consideration(t)):
+        anchor = 'MERGER_CASH_STOCK' if merger_share_consideration(t)['consideration_type'] == 'CASH_AND_STOCK' else 'MERGER_STOCK'
     elif re.search(r'(?:consummated|completed|closed).{0,100}initial public offering', t):
         anchor = 'IPO_COMPLETED'
     elif re.search(r'(?:entered into|amends and restates|executed|amended).{0,300}(?:credit(?: and security)? agreement|loan agreement)', t):
@@ -127,7 +167,7 @@ def classify_event(text: str, *, cleaned=False) -> Tuple[str, int, str]:
             if re.search(r'\bclosed\b|\bconsummated\b|\bcompleted\b|\bfunded\b|\beffected\b', sentence) and not re.search(r'\bif\b|\bnot\b|\bwill\b|\bwould\b|\bmay\b|\bexpected\b|\banticipat\w*\b|\bsubject to\b|\bupon\b', sentence):
                 proof = max(proof, 3)
         if re.search(r"\bgo-live\b|\bcommenced operations\b|\brevenue recognized\b|\bcommercial operations\b|\bplaced into service\b", t): proof = max(proof, 4)
-    if label in {'MERGER_REVERSE_MERGER', 'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR', 'MERGER_CVR_UNVERIFIED'} and proof >= 3:
+    if label in MERGER_KINDS and proof >= 3:
         # Completing a filing or funding a tranche does not close the merger.
         merger_closed = any(
             re.search(r'\b(?:closed|completed|consummated)\s+(?:(?:the|its|their|previously|announced)\s+)*(?:merger|business combination)\b|\b(?:merger|business combination)\s+(?:(?:has|have) (?:been )?|was |is now )?(?:successfully )?(?:closed|completed|consummated)\b', sentence)

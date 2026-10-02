@@ -8,7 +8,7 @@ def score_candidate(c: Candidate) -> float:
         s += 18 if nav>=2 else 15 if nav>=1.5 else 11 if nav>=1 else 6 if nav>=.7 else 0
     elif c.net_cash_usd is not None and c.strict_fd_market_cap():
         r=c.net_cash_usd/c.strict_fd_market_cap(); s += 12 if r>=.75 else 8 if r>=.4 else 4 if r>=.2 else 0
-    if c.event_type in {"MERGER_REVERSE_MERGER","MERGER_CASH_CVR","REVERSE_MERGER_CVR","LIQUIDATION_DISTRIBUTION","ASSET_SALE_ACQUISITION","STRATEGIC_INVESTMENT_PIPE","LARGE_CONTRACT"}: s+=18
+    if c.event_type in {"MERGER_REVERSE_MERGER","MERGER_CASH_STOCK","MERGER_STOCK","MERGER_CASH_CVR","REVERSE_MERGER_CVR","LIQUIDATION_DISTRIBUTION","ASSET_SALE_ACQUISITION","STRATEGIC_INVESTMENT_PIPE","LARGE_CONTRACT"}: s+=18
     elif c.event_type == "BUSINESS_PIVOT" or (c.event_type == "DEBT_RESTRUCTURING" and c.event_terms.get('materiality') == 'STRUCTURAL'): s+=14
     elif c.event_type=="LISTING_CAPITAL_STRUCTURE": s+=5
     adv=c.adv20_usd or 0; s += 12 if adv>=5_000_000 else 10 if adv>=1_000_000 else 8 if adv>=250_000 else 4 if adv>=50_000 else 0

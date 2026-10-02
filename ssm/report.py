@@ -19,10 +19,18 @@ def _terms(c):
         parts.append('Stock consideration')
         if 'legacy_holder_ownership_pct' in t: parts.append(f"Legacy holders: approximately {t['legacy_holder_ownership_pct']:g}%")
         if 'target_and_financing_ownership_pct' in t: parts.append(f"Target and financing holders: approximately {t['target_and_financing_ownership_pct']:g}%")
-        parts.append('Pro forma ownership subject to closing adjustments; not a current FD share count')
+        if t.get('ownership_subject_to_closing_adjustments'): parts.append('Pro forma ownership subject to closing adjustments; not a current FD share count')
     if t.get('cvr_basis'): parts.append(t['cvr_basis'] + '; payment may be zero')
     if t.get('cvr_distribution_status') == 'CONTEMPLATED': parts.append('CVR distribution contemplated, subject to declaration and closing')
     if 'cash_per_share_usd' in t: parts.append(f"Cash at closing: ${t['cash_per_share_usd']:.2f}/share")
+    if 'stock_exchange_ratio' in t:
+        security = t.get('stock_consideration_ticker') or t.get('stock_consideration_security', 'consideration security')
+        parts.append(f"Stock at closing: {t['stock_exchange_ratio']:g} shares of {security} per existing common share")
+    if t.get('cash_adjustment_direction') == 'DOWNWARD': parts.append('Cash is subject to downward adjustment for a net working capital shortfall; the stated amount is not a guaranteed floor')
+    if 'rights_offering_shares' in t: parts.append(f"Rights offering: {t['rights_offering_shares']:,} common shares at ${t['rights_subscription_price_usd']:.2f}; gross proceeds {_m(t['rights_gross_proceeds_usd'])}")
+    if 'backstop_exchange_common_shares' in t: parts.append(f"Backstop exchange: {t['backstop_exchange_common_shares']:,} common shares to be issued")
+    if 'combined_notes_principal_reduction_usd' in t: parts.append(f"Expected notes principal reduction: {_m(t['combined_notes_principal_reduction_usd'])}, combining exchange and par redemptions")
+    if 'expected_post_transaction_common_shares' in t: parts.append(f"Expected post-transaction issued common shares: {t['expected_post_transaction_common_shares']:,}; requires reconciliation and is not the current FD share count")
     if t.get('cvr_conditional'):
         parts.append('CVR: contingent; ' + ('non-tradable' if t.get('cvr_transferable') is False else 'transfer terms require review'))
     if 'illustrative_total_per_share_usd' in t: parts.append(f"Full-performance illustration: ${t['illustrative_total_per_share_usd']:.2f}; per-share CVR varies, not a fixed guaranteed payout")
@@ -70,7 +78,7 @@ def write_outputs(candidates,cfg,out_dir):
     top=[c for c in candidates if c.bucket=="A_RESEARCH_NOW"][:cfg["max_candidates"]]; watch=[c for c in candidates if c.bucket in ("B_WATCH","C_SPECULATIVE")][:10]; reject=[c for c in candidates if c.bucket=="REJECT"][:10]; hold=[c for c in candidates if c.bucket=="DATA_HOLD"][:10]
     md=["# Special Situation Microcap — latest","",f"**SAFE_TO_ACT: {'TRUE' if safe else 'FALSE'}**",""]
     material=[c for c in candidates if _active_common(c) and (
-        c.event_type in {'MERGER_CASH_CVR','REVERSE_MERGER_CVR','MERGER_REVERSE_MERGER','LIQUIDATION_DISTRIBUTION'} or
+        c.event_type in {'MERGER_CASH_CVR','MERGER_CASH_STOCK','MERGER_STOCK','REVERSE_MERGER_CVR','MERGER_REVERSE_MERGER','LIQUIDATION_DISTRIBUTION'} or
         (c.event_type == 'DEBT_RESTRUCTURING' and c.event_terms.get('materiality') == 'STRUCTURAL') or
         c.dilution.pending_stock_consideration_usd is not None or
         any(k in c.event_terms for k in ('new_warrant_shares','sale_price_estimate_usd','repurchase_total_usd')))]

@@ -2,11 +2,11 @@
 from datetime import date, datetime, timedelta
 import re
 
-from .event_rules import classify_event, operative_text, liquidation_evidence, adopted_rights_plan, resale_registration, closed_debt_equity_exchange
+from .event_rules import classify_event, operative_text, liquidation_evidence, adopted_rights_plan, resale_registration, closed_debt_equity_exchange, merger_share_consideration, MERGER_KINDS
 
 PRIORITY = {'TERMINAL_MERGER': 110, 'MERGER_TERMINATED': 105,
             'LIQUIDATION_DISTRIBUTION': 100, 'MERGER_CASH_CVR': 90, 'REVERSE_MERGER_CVR': 90, 'MERGER_CVR_UNVERIFIED': 85,
-            'MERGER_REVERSE_MERGER': 85, 'ASSET_SALE_ACQUISITION': 70,
+            'MERGER_REVERSE_MERGER': 85, 'MERGER_CASH_STOCK': 85, 'MERGER_STOCK': 85, 'ASSET_SALE_ACQUISITION': 70,
             'STRATEGIC_INVESTMENT_PIPE': 65, 'DEBT_RESTRUCTURING': 60,
             'LARGE_CONTRACT': 50, 'BUSINESS_PIVOT': 45,
             'LISTING_CAPITAL_STRUCTURE': 25}
@@ -16,7 +16,7 @@ MONTH_DATE = r'([A-Z][a-z]+\s+\d{1,2},\s*20\d{2})'
 def select_event(reviewed):
     if not reviewed:
         return None
-    latest_merger = max((x.get('filed', '') for x in reviewed if x['event_type'] in {'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR', 'MERGER_CVR_UNVERIFIED', 'MERGER_REVERSE_MERGER'}), default='')
+    latest_merger = max((x.get('filed', '') for x in reviewed if x['event_type'] in MERGER_KINDS), default='')
     eligible = [x for x in reviewed if not (x['event_type'] == 'MERGER_TERMINATED' and x.get('filed', '') < latest_merger)]
     # Retain active merger/liquidation lifecycles through routine filings.
     # Other transactions use recency; an old asset deal cannot hide refinancing.
@@ -37,7 +37,7 @@ def _date_after(text, anchor, distance=180):
 def event_terms(text, kind, *, cleaned=False):
     t = text if cleaned else operative_text(text)
     terms = {}
-    if kind in {'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR', 'MERGER_CVR_UNVERIFIED', 'MERGER_REVERSE_MERGER', 'TERMINAL_MERGER'}:
+    if kind in MERGER_KINDS | {'TERMINAL_MERGER'}:
         cash = re.search(r'\$\s*(\d+(?:\.\d+)?)\s+per share.{0,45}?in cash', t, re.I)
         if not cash:
             cash = re.search(r'converted into.{0,100}?\$\s*(\d+(?:\.\d+)?)\s+(?:cash|per share)', t, re.I)
@@ -63,6 +63,10 @@ def event_terms(text, kind, *, cleaned=False):
                 terms['cvr_basis'] = 'Legacy asset monetization net proceeds'
             if re.search(r'may declare', t, re.I):
                 terms['cvr_distribution_status'] = 'CONTEMPLATED'
+        if kind in {'MERGER_CASH_STOCK', 'MERGER_STOCK'}:
+            terms.update(merger_share_consideration(t))
+            if kind == 'MERGER_STOCK':
+                terms.pop('cash_per_share_usd', None)
     if kind == 'LIQUIDATION_DISTRIBUTION':
         distribution = None
         for clause in liquidation_evidence(t):
@@ -119,6 +123,24 @@ def event_terms(text, kind, *, cleaned=False):
         structural = bool(warrant or closed_debt_equity_exchange(t))
         if closed_debt_equity_exchange(t):
             terms['capital_structure_action'] = 'DEBT_EQUITY_EXCHANGE'
+            rights = re.search(r'(\d[\d,]*) shares.{0,200}purchased.{0,160}subscription price of\s*\$\s*([\d.]+).{0,100}gross proceeds of\s*\$\s*([\d.]+)\s*million', t, re.I)
+            if rights:
+                terms.update(rights_offering_shares=int(rights.group(1).replace(',', '')),
+                             rights_subscription_price_usd=float(rights.group(2)),
+                             rights_gross_proceeds_usd=float(rights.group(3)) * 1e6)
+            post = re.search(r'expects to have\s*(\d[\d,]*) shares of Common Stock issued and outstanding', t, re.I)
+            if post:
+                terms['expected_post_transaction_common_shares'] = int(post.group(1).replace(',', ''))
+                terms['post_transaction_share_count_status'] = 'EXPECTED'
+            backstop = re.search(r'(\d[\d,]*) shares of Common Stock will be issued to the Backstop Parties', t, re.I)
+            if backstop:
+                terms['backstop_exchange_common_shares'] = int(backstop.group(1).replace(',', ''))
+                terms['backstop_share_issuance_status'] = 'EXPECTED'
+            reduction = re.search(r'principal amount.{0,80}will be reduced by\s*\$\s*([\d.]+)\s*million.{0,140}combination of par redemptions', t, re.I)
+            if reduction:
+                terms['combined_notes_principal_reduction_usd'] = float(reduction.group(1)) * 1e6
+                terms['debt_principal_reduction_status'] = 'EXPECTED'
+                terms['debt_principal_reduction_scope'] = 'EXCHANGE_AND_PAR_REDEMPTIONS'
         for sentence in re.split(r'(?<=[.;])\s+', t):
             if re.search(r'\bif\b|\bunless\b|\bmay\b|\bwould\b|\bnot\b', sentence, re.I):
                 continue

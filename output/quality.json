@@ -1,24 +1,15 @@
 {
   "SAFE_TO_ACT": false,
-  "sec_discovery_mode": "retained-337-scan+two-issuer-event-source-replays",
-  "candidate_count": 337,
-  "financial_review_incomplete_count": 69,
-  "data_hold_count": 196,
+  "sec_discovery_mode": "atom",
+  "candidate_count": 477,
+  "financial_review_incomplete_count": 89,
+  "data_hold_count": 288,
   "pass_count": 0,
   "watch_count": 2,
-  "reject_count": 80,
-  "excluded_count": 59,
-  "active_common_count": 224,
-  "source_commit": "04ca00b41ced49800f2cc62cdeb2564d4334c375",
-  "generated_at": "2026-10-02T13:31:57.696784+00:00",
-  "base_snapshot_commit": "67afba47f96f2ef2427d383903fee0a55013897d",
-  "base_scan_generated_at": "2026-10-02T11:53:35.836223+00:00",
-  "base_scan_workflow_run_id": "37002207547",
-  "generation_mode": "retained_337_snapshot_with_two_event_source_replays",
-  "content_corrected_tickers": [
-    "COLA",
-    "FLOC"
-  ],
-  "regression_tests_passed": 150,
-  "validation_scope": "FLOC and COLA current SEC event source replays. Other 335 rows and financial/market inputs retained; no fresh full-universe or FD audit."
+  "reject_count": 107,
+  "excluded_count": 80,
+  "active_common_count": 300,
+  "source_commit": "4280245de39ec89221e3fb3541ed60e6d7282a7a",
+  "workflow_run_id": "37073600624",
+  "generated_at": "2026-10-02T22:57:38.148305+00:00"
 }

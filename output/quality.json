@@ -1,35 +1,15 @@
 {
   "SAFE_TO_ACT": false,
-  "sec_discovery_mode": "retained-scan+three-latest-issuer-pipeline-refreshes",
-  "candidate_count": 320,
-  "financial_review_incomplete_count": 65,
-  "data_hold_count": 187,
+  "sec_discovery_mode": "atom",
+  "candidate_count": 337,
+  "financial_review_incomplete_count": 69,
+  "data_hold_count": 197,
   "pass_count": 0,
   "watch_count": 2,
-  "reject_count": 75,
-  "excluded_count": 56,
-  "active_common_count": 214,
-  "source_commit": "f1dd7ffa8ef51214c6f0bb7f4b8638ceb1166e45",
-  "generated_at": "2026-10-02T09:47:34.482106+00:00",
-  "generation_mode": "retained_320_snapshot_with_three_latest_issuer_pipeline_refreshes",
-  "base_snapshot_commit": "42c6c3eb5f2422fc337eb45eac9f80ccc4476c07",
-  "base_scan_source_commit": "768297f4dd2bb2d64bae1be66cacd1ee887a5710",
-  "base_scan_workflow_run_id": "36962830987",
-  "base_scan_generated_at": "2026-10-02T04:17:17.965153+00:00",
-  "prior_content_corrected_tickers": [
-    "APUR",
-    "CBNK",
-    "GPRO",
-    "KLXE"
-  ],
-  "content_corrected_tickers": [
-    "PUSA",
-    "SMTI",
-    "VRME"
-  ],
-  "stabilization_policy": "docs/stabilization-policy.md",
-  "regression_tests_passed": 137,
-  "v1_validation_scope": "Known material issues and PUSA/SMTI/VRME latest SEC pipeline replays; no full-universe zero-error assertion.",
-  "market_snapshot": "October 1 snapshot retained for PUSA/SMTI; old VRME quote suppressed pending OPNW reconciliation.",
-  "full_scan_note": "Three issuers were refreshed through current SEC discovery, event and financial pipelines. Other 317 rows retain the prior full scan. This is not a fresh 320-issuer full-universe scan."
+  "reject_count": 80,
+  "excluded_count": 58,
+  "active_common_count": 225,
+  "source_commit": "0fb66f0e7f387dafaa265f44072318e5b7b47672",
+  "workflow_run_id": "37002207547",
+  "generated_at": "2026-10-02T11:53:35.836223+00:00"
 }

@@ -1,6 +1,6 @@
 {
   "SAFE_TO_ACT": false,
-  "sec_discovery_mode": "atom",
+  "sec_discovery_mode": "atom+submissions-content-recheck",
   "candidate_count": 320,
   "financial_review_incomplete_count": 65,
   "data_hold_count": 187,
@@ -9,7 +9,27 @@
   "reject_count": 75,
   "excluded_count": 56,
   "active_common_count": 214,
-  "source_commit": "768297f4dd2bb2d64bae1be66cacd1ee887a5710",
-  "workflow_run_id": "36962830987",
-  "generated_at": "2026-10-02T04:17:17.965153+00:00"
+  "source_commit": "badecd959aa6799a757c4b3c5b982a8cebae92e4",
+  "generated_at": "2026-10-02T06:16:44.512983+00:00",
+  "generation_mode": "full_scan_with_three_sec_content_rechecks_and_excluded_warrant_label_correction",
+  "base_snapshot_commit": "86ea8a9ff9ff0c1dcf59dd722096670c273c37fa",
+  "base_scan_source_commit": "768297f4dd2bb2d64bae1be66cacd1ee887a5710",
+  "base_scan_workflow_run_id": "36962830987",
+  "base_scan_generated_at": "2026-10-02T04:17:17.965153+00:00",
+  "content_corrected_tickers": [
+    "DJTWW",
+    "KLXE",
+    "LRHC",
+    "UWMC"
+  ],
+  "refreshed_issuer_pipeline_tickers": [
+    "KLXE",
+    "LRHC",
+    "UWMC"
+  ],
+  "excluded_warrant_primary_reclassification": [
+    "DJTWW"
+  ],
+  "market_snapshot": "2026-10-01 closing snapshot retained; three issuer SEC filing and financial pipelines refreshed.",
+  "full_scan_note": "Retains the completed 320-row scan, with KLXE, LRHC and UWMC rechecked against current SEC filings and the excluded DJTWW warrant label corrected against its selected primary filing; does not claim a new full scan of every issuer."
 }

@@ -127,6 +127,14 @@ def classify_event(text: str, *, cleaned=False) -> Tuple[str, int, str]:
             if re.search(r'\bclosed\b|\bconsummated\b|\bcompleted\b|\bfunded\b|\beffected\b', sentence) and not re.search(r'\bif\b|\bnot\b|\bwill\b|\bwould\b|\bmay\b|\bexpected\b|\banticipat\w*\b|\bsubject to\b|\bupon\b', sentence):
                 proof = max(proof, 3)
         if re.search(r"\bgo-live\b|\bcommenced operations\b|\brevenue recognized\b|\bcommercial operations\b|\bplaced into service\b", t): proof = max(proof, 4)
+    if label in {'MERGER_REVERSE_MERGER', 'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR', 'MERGER_CVR_UNVERIFIED'} and proof >= 3:
+        # Completing a filing or funding a tranche does not close the merger.
+        merger_closed = any(
+            re.search(r'\b(?:closed|completed|consummated)\s+(?:(?:the|its|their|previously|announced)\s+)*(?:merger|business combination)\b|\b(?:merger|business combination)\s+(?:(?:has|have) (?:been )?|was |is now )?(?:successfully )?(?:closed|completed|consummated)\b', sentence)
+            and not re.search(r'\bif\b|\bnot\b|\bwill\b|\bwould\b|\bmay\b|\bexpected\b|\banticipat\w*\b|\bpending\b|\bremains\b|\bto be (?:closed|completed|consummated)\b|\bsubject to\b|\bfiling\b|\bregistration statement\b', sentence)
+            for sentence in re.split(r'(?<=[.;])\s+', t))
+        if not merger_closed:
+            proof = 2
     if terminal:
         proof = 3
     if anchor == 'LISTING_CAPITAL_STRUCTURE' and adopted_rights_plan(t):

@@ -124,3 +124,36 @@ def test_resale_registration_is_not_new_asset_purchase_or_share_issuance():
     assert kind == 'LISTING_CAPITAL_STRUCTURE'
     assert event_status(text, kind, proof) == 'REGISTERED'
     assert event_terms(text, kind)['capital_structure_action'] == 'RESALE_REGISTRATION'
+
+
+def test_completed_merger_registration_filing_does_not_mean_merger_closed():
+    text = ('The Company entered into an amended note in connection with the Merger Agreement. '
+            'The amended note represents the first tranche funded by the Company. '
+            'The registration statement was submitted in connection with the transactions contemplated by '
+            'the Merger Agreement, which filing was completed on the same date. '
+            'The note contains events of default including bankruptcy, insolvency, liquidation or winding up events.')
+    kind, proof, _ = classify_event(text)
+    assert kind == 'MERGER_REVERSE_MERGER'
+    assert proof == 2
+    assert event_status(text, kind, proof) == 'SIGNED'
+
+
+def test_actual_merger_completion_survives_completed_registration_sentence():
+    text = ('The parties entered into a merger agreement. '
+            'The filing of the registration statement was completed. '
+            'The parties completed the merger on September 30, 2026.')
+    kind, proof, _ = classify_event(text)
+    assert kind == 'MERGER_REVERSE_MERGER'
+    assert proof == 3
+    assert event_status(text, kind, proof) == 'COMPLETED'
+
+
+@pytest.mark.parametrize('pending', [
+    'The merger is anticipated to be completed in the fourth quarter.',
+    'The merger remains to be completed after shareholder approval.',
+])
+def test_funded_financing_cannot_complete_a_pending_merger(pending):
+    text = 'The Company entered into a merger agreement. The first financing tranche was funded. ' + pending
+    kind, proof, _ = classify_event(text)
+    assert proof == 2
+    assert event_status(text, kind, proof) == 'SIGNED'

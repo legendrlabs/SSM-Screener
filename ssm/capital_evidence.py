@@ -16,17 +16,27 @@ def preferred_signal_text(text: str) -> str:
     sentences = re.split(r'(?<=\.)\s+', text)
     result = []
     for sentence in sentences:
+        # Zero is a statement about issued securities, not an authorized amount.
+        def mask_unissued(match):
+            tail = sentence[match.end():]
+            if re.search(r'\bissued\s+[1-9][\d,]*\s+(?:preferred\s+)?shares\b|\b[1-9][\d,]*\s+shares\s+(?:were\s+)?issued\b', tail, re.I):
+                return match.group(0)
+            return '_PREFERRED_CAPACITY_'
+        sentence = re.sub(r'\bno\s+preferred (?:stock|shares)\s+(?:(?:were|are|have been)\s+)?issued\s+and\s+outstanding\b',
+                          mask_unissued, sentence, flags=re.I)
         accounting = bool(re.search(r'\b(?:ASU\s+\d{4}-\d+|FASB)\b', sentence, re.I))
         shelf = bool(re.search(r'\bmay\b[^.]{0,100}\bsell\b', sentence, re.I)
                      and re.search(r'shelf registration', sentence, re.I))
         charter = bool(re.search(r'blank check', sentence, re.I)
                        and re.search(r'\bcould\b', sentence, re.I))
+        authorization = bool(re.search(r'\bauthoriz(?:ed|e|es|ation)\b', sentence, re.I)
+                             and not re.search(r'\bissued\b|\boutstanding\b|convertible into', sentence, re.I))
         # Actual issuer-specific holdings or issuances must survive boilerplate.
         positive = (r'\b[1-9][\d,]*\s+(?:preferred\s+)?shares\s+(?:(?:were|are)\s+)?(?:issued|outstanding)\b'
                     r'|\bissued\s+[1-9][\d,]*\s+(?:preferred\s+)?shares\b')
         live = bool(re.search(r'\b(?:our|its)\s+(?:Series\s+[A-Z0-9-]+\s+)?preferred|\bCompany\b[^.]{0,50}\bissued\b|\bremain\w*\s+outstanding', sentence, re.I)
                     or re.search(positive, sentence, re.I))
-        if (accounting or shelf or charter) and not live:
+        if (accounting or shelf or charter or authorization) and not live:
             result.append(re.sub(pattern, '_PREFERRED_CAPACITY_', sentence, flags=re.I))
             continue
 
@@ -42,6 +52,58 @@ def preferred_signal_text(text: str) -> str:
 
         result.append(re.sub(pattern, mask_zero, sentence, flags=re.I))
     return ' '.join(result)
+
+
+def capital_clauses(text: str) -> list[str]:
+    # Table rows are separate capital/cash-flow concepts. Never join an old
+    # earnout cash payment to the next row's unrelated common-stock issuance.
+    bounded = re.sub(r'</(?:p|div|tr|table|h[1-6])\s*>', '. ', text or '', flags=re.I)
+    return re.split(r'(?<=[.;])\s+', visible_filing_text(bounded))
+
+
+def pending_stock_consideration(text: str):
+    plain = visible_filing_text(text)
+    payment = re.search(r'(?:purchase price|consideration).{0,130}will be paid in.{0,60}common stock|common stock.{0,100}to be issued.{0,80}(?:closing|payment)|will issue.{0,60}shares.{0,70}(?:consideration|target shareholders)', plain, re.I)
+    if not payment:
+        return False, None
+    price = re.search(r'(?:base )?purchase price of\s*\$\s*([\d,.]+)\s*(million|thousand)?', plain, re.I)
+    fraction = re.search(r'(one[- ]half|one[- ]third|one[- ]quarter|\d+(?:\.\d+)?\s*%)\s+of the purchase price will be paid in.{0,50}common stock', plain, re.I)
+    value = None
+    if price and fraction:
+        amount = float(price.group(1).replace(',', ''))
+        amount *= {'million': 1e6, 'thousand': 1e3}.get((price.group(2) or '').lower(), 1)
+        f = fraction.group(1).lower()
+        proportion = {'one-half': .5, 'one half': .5, 'one-third': 1/3, 'one third': 1/3, 'one-quarter': .25, 'one quarter': .25}.get(f)
+        if proportion is None:
+            proportion = float(f.replace('%', '').strip()) / 100
+        value = amount * proportion
+    return True, value
+
+
+def unresolved_stock_awards(text: str, clauses: list[str]) -> bool:
+    award = r'stock options?|restricted stock units?|performance stock units?|\bRSUs?\b|\bPSUs?\b'
+    for clause in clauses:
+        for match in re.finditer(award, clause, re.I):
+            nearby = clause[max(0, match.start()-180):match.end()+180]
+            # A zero RSU balance cannot clear live options in the same clause.
+            before = clause[max(0, match.start()-100):match.start()]
+            if re.search(r'\bno\s+(?:(?:unvested|outstanding)\s+)?$', before, re.I):
+                continue
+            if re.search(r'unvested|remain outstanding|potentially dilutive|excluded.{0,80}(?:net loss|diluted)', nearby, re.I):
+                return True
+    parser = _Tables()
+    parser.feed(text or '')
+    for table in parser.tables:
+        if not re.search(r'potentially dilutive|excluded|outstanding', table['context'], re.I):
+            continue
+        for row in table['rows']:
+            cells = [c for c in row if c]
+            if len(cells) < 2 or not re.search(award, cells[0], re.I):
+                continue
+            current = cells[1].replace(',', '').strip()
+            if re.fullmatch(r'\d+(?:\.\d+)?', current) and float(current) > 0:
+                return True
+    return False
 
 
 class _Tables(HTMLParser):

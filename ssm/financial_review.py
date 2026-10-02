@@ -53,6 +53,8 @@ def conservative_merge_dilution(current: Dilution, financial: Dilution) -> Dilut
         out.confidence = "high"
     for field in DILUTION_FIELDS:
         setattr(out, field, max(float(getattr(current, field, 0) or 0), float(getattr(financial, field, 0) or 0)))
+    consideration = [d.pending_stock_consideration_usd for d in (current, financial) if d.pending_stock_consideration_usd is not None]
+    out.pending_stock_consideration_usd = max(consideration) if consideration else None
     unit_evidence = [d for d in (current, financial) if d.warrant_units_as_of]
     if unit_evidence:
         latest_date = max(d.warrant_units_as_of for d in unit_evidence)

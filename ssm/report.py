@@ -9,26 +9,67 @@ def _m(x):
     if abs(x)>=1e3:return f"${x/1e3:.1f}K"
     return f"${x:.2f}"
 
+def _active_common(c):
+    return c.security_type == 'COMMON_EQUITY' and c.gate_status != 'EXCLUDED' and c.event_status not in {'TERMINAL','CANCELLED'}
+
+def _terms(c):
+    t=c.event_terms; parts=[]
+    if 'cash_per_share_usd' in t: parts.append(f"Cash at closing: ${t['cash_per_share_usd']:.2f}/share")
+    if t.get('cvr_conditional'):
+        parts.append('CVR: contingent; ' + ('non-tradable' if t.get('cvr_transferable') is False else 'transfer terms require review'))
+    if 'illustrative_total_per_share_usd' in t: parts.append(f"Full-performance illustration: ${t['illustrative_total_per_share_usd']:.2f}; per-share CVR varies, not a fixed guaranteed payout")
+    if 'distribution_per_share_usd' in t: parts.append(f"Distribution: ${t['distribution_per_share_usd']:.2f}/share ({t.get('distribution_status','UNKNOWN')})")
+    for key in ('record_date','payment_date','ex_dividend_date','last_trading_date','dissolution_date'):
+        if key in t: parts.append(f"{key}: {t[key]}" + (' (planned)' if key in {'last_trading_date','dissolution_date'} else ''))
+    if t.get('due_bills'): parts.append('Due bills apply; record date alone does not establish distribution entitlement')
+    if 'new_warrant_shares' in t: parts.append(f"New warrants: {t['new_warrant_shares']:,} shares at ${t['new_warrant_exercise_price_usd']:.2f}; reconcile with outstanding baseline")
+    if 'sale_price_estimate_usd' in t: parts.append(f"Sale price estimate: {_m(t['sale_price_estimate_usd'])}")
+    if 'repurchase_total_usd' in t: parts.append(f"Repurchase cap: {_m(t['repurchase_total_usd'])} total, increase {_m(t['repurchase_increment_usd'])}" + (' (conditional on closing)' if t.get('repurchase_conditional') else ''))
+    if c.dilution.pending_stock_consideration_usd is not None: parts.append(f"Pending stock consideration: ${c.dilution.pending_stock_consideration_usd/1e6:.3f}M; incremental share count unresolved")
+    return '; '.join(parts) or c.event_summary
+
 def write_outputs(candidates,cfg,out_dir):
     out=Path(out_dir); out.mkdir(parents=True,exist_ok=True)
     flat=[]
     for c in candidates:
-        d=c.to_dict(); dil=d.pop("dilution"); d.update({f"dilution_{k}":v for k,v in dil.items()}); d["data_warnings"]=" | ".join(d.get("data_warnings") or []); flat.append(d)
+        d=c.to_dict(); dil=d.pop("dilution")
+        if not _active_common(c):
+            d['fd_ratio']=None
+            for key in dil: dil[key]=None
+        d.update({f"dilution_{k}":v for k,v in dil.items()})
+        for key in ('event_terms','event_sources','event_history'): d[key]=json.dumps(d[key],ensure_ascii=False,sort_keys=True)
+        d["data_warnings"]=" | ".join(d.get("data_warnings") or []); flat.append(d)
     if flat:
         with (out/"candidates.csv").open("w",newline="",encoding="utf-8-sig") as f: w=csv.DictWriter(f,fieldnames=list(flat[0].keys()));w.writeheader();w.writerows(flat)
     else:(out/"candidates.csv").write_text("",encoding="utf-8")
     with (out/"dilution_check.csv").open("w",newline="",encoding="utf-8-sig") as f:
         fields=["ticker","common_shares","near_fd_shares","strict_fd_shares","fd_ratio","pre_funded_warrants_outstanding","ordinary_warrants_outstanding","warrant_units_as_of","atm_remaining_usd","atm_ratio","confidence","source"];w=csv.DictWriter(f,fieldnames=fields);w.writeheader()
-        for c in candidates:w.writerow({"ticker":c.ticker,"common_shares":c.dilution.common_shares,"near_fd_shares":c.dilution.near_fd_shares if c.dilution.confidence != 'low' else None,"strict_fd_shares":c.dilution.strict_fd_shares if c.dilution.confidence != 'low' else None,"fd_ratio":c.dilution.fd_ratio,"pre_funded_warrants_outstanding":c.dilution.pre_funded_warrants_outstanding,"ordinary_warrants_outstanding":c.dilution.ordinary_warrants_outstanding,"warrant_units_as_of":c.dilution.warrant_units_as_of,"atm_remaining_usd":c.dilution.atm_remaining_usd,"atm_ratio":c.atm_ratio(),"confidence":c.dilution.confidence,"source":c.dilution.source})
+        for c in candidates:
+            if not _active_common(c):
+                w.writerow({'ticker':c.ticker,'source':'Excluded: capital metrics are not applicable'})
+                continue
+            w.writerow({"ticker":c.ticker,"common_shares":c.dilution.common_shares,"near_fd_shares":c.dilution.near_fd_shares if c.dilution.confidence != 'low' else None,"strict_fd_shares":c.dilution.strict_fd_shares if c.dilution.confidence != 'low' else None,"fd_ratio":c.dilution.fd_ratio,"pre_funded_warrants_outstanding":c.dilution.pre_funded_warrants_outstanding,"ordinary_warrants_outstanding":c.dilution.ordinary_warrants_outstanding,"warrant_units_as_of":c.dilution.warrant_units_as_of,"atm_remaining_usd":c.dilution.atm_remaining_usd,"atm_ratio":c.atm_ratio(),"confidence":c.dilution.confidence,"source":c.dilution.source})
     with (out/"event_ledger.csv").open("w",newline="",encoding="utf-8-sig") as f:
-        fields=["ticker","event_date","form","event_type","event_proof","accession","summary","gate_status","bucket"];w=csv.DictWriter(f,fieldnames=fields);w.writeheader()
-        for c in candidates:w.writerow({"ticker":c.ticker,"event_date":c.latest_event_date,"form":c.latest_event_form,"event_type":c.event_type,"event_proof":c.event_proof,"accession":c.latest_event_accession,"summary":c.event_summary,"gate_status":c.gate_status,"bucket":c.bucket})
+        fields=["ticker","security_type","event_date","most_recent_filing_date","form","event_type","event_status","event_proof","accession","summary","event_terms","event_sources","event_history","event_selection_reason","gate_status","bucket"];w=csv.DictWriter(f,fieldnames=fields);w.writeheader()
+        for c in candidates:w.writerow({"ticker":c.ticker,"security_type":c.security_type,"event_date":c.latest_event_date,"most_recent_filing_date":c.most_recent_filing_date,"form":c.latest_event_form,"event_type":c.event_type,"event_status":c.event_status,"event_proof":c.event_proof,"accession":c.latest_event_accession,"summary":c.event_summary,"event_terms":json.dumps(c.event_terms,sort_keys=True),"event_sources":json.dumps(c.event_sources),"event_history":json.dumps(c.event_history,sort_keys=True),"event_selection_reason":c.event_selection_reason,"gate_status":c.gate_status,"bucket":c.bucket})
     action_candidates=[c for c in candidates if c.bucket=="A_RESEARCH_NOW"]
-    safe=bool(action_candidates) and all(c.gate_status=="PASS" and c.financial_review_complete for c in action_candidates)
+    safe=bool(action_candidates) and all(_active_common(c) and c.gate_status=="PASS" and c.financial_review_complete and c.event_review_complete for c in action_candidates)
     q={"SAFE_TO_ACT":safe,"sec_discovery_mode":cfg.get("_sec_discovery_mode","unknown"),"candidate_count":len(candidates),"financial_review_incomplete_count":sum(not c.financial_review_complete for c in candidates),"data_hold_count":sum(c.gate_status=="DATA_HOLD" for c in candidates),"pass_count":sum(c.gate_status=="PASS" for c in candidates),"watch_count":sum(c.gate_status=="WATCH" for c in candidates),"reject_count":sum(c.gate_status=="REJECT" for c in candidates)}
+    q['excluded_count']=sum(c.gate_status=='EXCLUDED' for c in candidates)
+    q['active_common_count']=sum(_active_common(c) for c in candidates)
+    q['financial_review_incomplete_count']=sum(_active_common(c) and not c.financial_review_complete for c in candidates)
     (out/"quality.json").write_text(json.dumps(q,indent=2),encoding="utf-8")
     top=[c for c in candidates if c.bucket=="A_RESEARCH_NOW"][:cfg["max_candidates"]]; watch=[c for c in candidates if c.bucket in ("B_WATCH","C_SPECULATIVE")][:10]; reject=[c for c in candidates if c.bucket=="REJECT"][:10]; hold=[c for c in candidates if c.bucket=="DATA_HOLD"][:10]
     md=["# Special Situation Microcap — latest","",f"**SAFE_TO_ACT: {'TRUE' if safe else 'FALSE'}**",""]
+    material=[c for c in candidates if _active_common(c) and (
+        c.event_type in {'MERGER_CASH_CVR','LIQUIDATION_DISTRIBUTION'} or
+        c.dilution.pending_stock_consideration_usd is not None or
+        any(k in c.event_terms for k in ('new_warrant_shares','sale_price_estimate_usd','repurchase_total_usd')))]
+    if material:
+        md += ['## Material special situations — source review required','']
+        for c in material:
+            md += [f"- **{c.ticker}** — {c.event_type} / {c.event_status} / {c.gate_status}. {_terms(c)}.",
+                   '  Sources: ' + ', '.join(f'[SEC {i+1}]({url})' for i,url in enumerate(c.event_sources))]
     if not top:md += ["## NO CANDIDATE",""]
     else:
         md += ["## A — RESEARCH NOW","","|Ticker|Price|Basic MC|Near-FD MC|Strict FD MC|Event|Proof|10-Q/K|Score|","|---|---:|---:|---:|---:|---|---:|---|---:|"]
@@ -36,5 +77,8 @@ def write_outputs(candidates,cfg,out_dir):
     for title,arr in [("B/C — WATCH",watch),("DATA HOLD",hold),("REJECT",reject)]:
         md += ["",f"## {title}",""]
         if not arr:md.append("- None")
-        for c in arr:md.append(f"- **{c.ticker}** — {c.bucket}, score {c.priority_score}. {'; '.join(c.data_warnings[:3])}")
+        for c in arr:md.append(f"- **{c.ticker}** — {c.bucket}, {c.event_type} / {c.event_status}, score {c.priority_score}. {'; '.join(c.data_warnings[:3])}")
+    excluded=[c for c in candidates if c.gate_status=='EXCLUDED']
+    md += ['',f'## EXCLUDED — {len(excluded)} securities','']
+    for c in excluded[:20]: md.append(f"- **{c.ticker}** — {c.security_type} / {c.event_status}. {'; '.join(c.data_warnings[:2])}")
     (out/"latest.md").write_text("\n".join(md),encoding="utf-8")

@@ -18,6 +18,7 @@ class Dilution:
     pre_funded_warrants_outstanding: Optional[float] = None
     ordinary_warrants_outstanding: Optional[float] = None
     warrant_units_as_of: Optional[str] = None
+    pending_stock_consideration_usd: Optional[float] = None
     source: str = ""
     confidence: str = "low"
 
@@ -41,6 +42,16 @@ class Candidate:
     name: str = ""
     exchange: str = ""
     cik: str = ""
+    security_type: str = 'COMMON_EQUITY'
+    security_title: str = ''
+    security_source: str = ''
+    event_status: str = 'UNKNOWN'
+    event_terms: Dict = field(default_factory=dict)
+    event_sources: List[str] = field(default_factory=list)
+    event_history: List[Dict] = field(default_factory=list)
+    event_review_complete: bool = True
+    event_selection_reason: str = ''
+    most_recent_filing_date: Optional[str] = None
     price: Optional[float] = None
     price_as_of: Optional[str] = None
     adv20_usd: Optional[float] = None
@@ -77,13 +88,16 @@ class Candidate:
     bucket: str = "DATA_HOLD"
 
     def basic_market_cap(self):
+        if self.security_type != 'COMMON_EQUITY' or self.event_status in {'TERMINAL', 'CANCELLED'} or self.gate_status == 'EXCLUDED': return None
         return self.price * self.dilution.common_shares if self.price is not None and self.dilution.common_shares > 0 else None
 
     def near_fd_market_cap(self):
+        if self.basic_market_cap() is None: return None
         if self.dilution.confidence == 'low': return None
         return self.price * self.dilution.near_fd_shares if self.price is not None and self.dilution.near_fd_shares > 0 else None
 
     def strict_fd_market_cap(self):
+        if self.basic_market_cap() is None: return None
         if self.dilution.confidence == 'low': return None
         return self.price * self.dilution.strict_fd_shares if self.price is not None and self.dilution.strict_fd_shares > 0 else None
 

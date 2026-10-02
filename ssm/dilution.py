@@ -3,7 +3,7 @@ import re
 from typing import Dict, Tuple
 from .models import Dilution
 from .financial_review import visible_filing_text
-from .capital_evidence import preferred_signal_text, outstanding_warrant_units
+from .capital_evidence import preferred_signal_text, outstanding_warrant_units, capital_clauses, pending_stock_consideration, unresolved_stock_awards
 
 NUM = r"(\d[\d,]*(?:\.\d+)?)\s*(million|thousand|m|k)?"
 
@@ -32,7 +32,7 @@ def _first(patterns, text):
 def heuristic_extract_dilution(text: str, common_shares: float = 0.0, *, event_context: bool = False) -> Tuple[Dilution, list[str]]:
     t = visible_filing_text(text)
     preferred_text = preferred_signal_text(t)
-    clauses = re.split(r'(?<=[.;])\s+', t)
+    clauses = capital_clauses(text)
     def scope(pattern):
         return ' ; '.join(clause for clause in clauses if re.search(pattern, clause, re.I))
     d = Dilution(common_shares=common_shares, source="heuristic filing-text parser", confidence="low")
@@ -70,7 +70,7 @@ def heuristic_extract_dilution(text: str, common_shares: float = 0.0, *, event_c
         d.pre_funded_shares = d.warrants_itm_shares = 0.0
         warnings.append('Outstanding warrant units reconciled; common-share equivalents and exercise/reset terms remain unresolved.')
     material = bool(re.search(
-        r"pre[- ]funded|warrant|convertible|\batm\b|at-the-market|equity line",
+        r"pre[- ]funded|\bwarrants?\b|convertible (?:notes?|debentures?|preferred)|\batm\b|at-the-market|equity line",
         t,
         re.I,
     ) or re.search(r'preferred (?:stock|shares)', preferred_text, re.I))
@@ -103,6 +103,15 @@ def heuristic_extract_dilution(text: str, common_shares: float = 0.0, *, event_c
         # contingent earnouts may be incremental. Neither is proven by a raw
         # issued-share count; require reconciliation before certifying FD.
         warnings.append('Unresolved incremental share obligations for merger consideration or earnout.')
+    if event_context:
+        if re.search(r'\b(?:issued|issue|issuance of|grant(?:ed)?)\s+(?:(?:\d[\d,.]*|new|additional|the|common stock)\s+){0,4}warrants?\b', t, re.I):
+            warnings.append('New event warrant tranche requires reconciliation against the outstanding financial baseline.')
+        pending, amount = pending_stock_consideration(text)
+        if pending:
+            d.pending_stock_consideration_usd = amount
+            warnings.append('Pending stock consideration; incremental share issuance is not reconciled.')
+    if unresolved_stock_awards(text, clauses):
+        warnings.append('Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.')
     if not warnings and common_shares > 0:
         d.confidence = "medium"
     return d, warnings

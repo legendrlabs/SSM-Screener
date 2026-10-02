@@ -22,6 +22,7 @@ class SecClient:
         self._submissions_cache = {}
         self._facts_cache = {}
         self._ticker_cache = None
+        self._texts_cache = {}
         self.s = requests.Session()
         self.s.headers.update({
             "User-Agent": self.user_agent,
@@ -200,9 +201,10 @@ class SecClient:
             raise
 
     def submission_text(self, filename_or_url):
-        if filename_or_url.startswith("http://") or filename_or_url.startswith("https://"):
-            return self._get(filename_or_url).text
-        return self._get(f"{SEC_BASE}/Archives/{filename_or_url.lstrip('/')}").text
+        url = filename_or_url if filename_or_url.startswith(('http://', 'https://')) else f"{SEC_BASE}/Archives/{filename_or_url.lstrip('/')}"
+        if url not in self._texts_cache:
+            self._texts_cache[url] = self._get(url).text
+        return self._texts_cache[url]
 
     def filing_index_url(self, cik, accession, index_url=None):
         if index_url:
@@ -219,7 +221,7 @@ class SecClient:
         url = self.filing_index_url(cik, accession, index_url=index_url)
         if not url:
             return []
-        page = self._get(url).text
+        page = self.submission_text(url)
         docs = []
         seen = set()
         for row in re.findall(r"<tr\b[^>]*>(.*?)</tr>", page, re.I | re.S):
@@ -253,7 +255,7 @@ class SecClient:
         out = []
         for doc in self.filing_documents(cik, accession, index_url=index_url)[:max_docs]:
             try:
-                text = self._get(doc["url"]).text
+                text = self.submission_text(doc["url"])
             except requests.RequestException:
                 continue
             out.append({**doc, "text": text})
@@ -321,6 +323,7 @@ class SecClient:
                 "accession": acc,
                 "primary_document": doc,
                 "primary_description": desc or "",
+                "report_date": r.get("reportDate", [""] * n)[i] or filed,
                 "filename": f"edgar/data/{int(cik)}/{acc.replace('-', '')}/{doc}",
                 "source": "submissions-financial",
             }

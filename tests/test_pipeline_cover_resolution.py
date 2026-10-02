@@ -15,6 +15,9 @@ class CoverOnlySec:
     def companyfacts(self, cik):
         return {}
 
+    def submissions(self, cik):
+        return {'filings': {'recent': {}}}
+
     def submission_text(self, filename):
         if filename == 'event':
             return self.event
@@ -27,7 +30,7 @@ class CoverOnlySec:
 
 def build(event, financial_extra='', override=None):
     return build_candidate(CoverOnlySec(event, financial_extra),
-                           {'ticker': 'COVER', 'name': 'Cover', 'exchange': 'Nasdaq', 'cik': '1'},
+                           {'ticker': 'COVER', 'name': 'Cover', 'exchange': 'Nasdaq', 'cik': '1', 'security_type': 'COMMON_EQUITY'},
                            {'filename': 'event', 'filed': date.today().isoformat(), 'form': '8-K', 'items': '2.01', 'accession': '1'},
                            {'COVER': override} if override else {}, json.load(open('config/default.json')),
                            {'price': 5, 'adv20_usd': 1_000_000})

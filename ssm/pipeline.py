@@ -9,6 +9,8 @@ from .scoring import score_candidate, bucket_candidate
 from .providers.sec import SecClient, latest_fact_value, filing_risk_flags
 from .providers.market import market_snapshot, market_snapshots
 from .financial_review import financial_note_hits, conservative_merge_dilution, cover_page_common_shares, extract_atm_remaining_usd
+from .events import review_material_events, event_terms, event_status
+from .securities import resolve_security
 
 OFFERING_FORMS = {"S-1", "S-3", "424B3", "424B5"}
 OWNERSHIP_FORMS = {"SC 13D", "SC 13D/A", "SC 13G", "SC 13G/A"}
@@ -31,7 +33,7 @@ def _ticker_map(sec):
         cik = str(int(x.get("cik")))
         t = str(x.get("ticker", "")).upper()
         rec = {"ticker": t, "name": x.get("name", ""), "exchange": x.get("exchange", ""), "cik": cik}
-        by_cik[cik] = rec
+        by_cik.setdefault(cik, []).append(rec)
         by_ticker[t] = rec
     return by_cik, by_ticker
 
@@ -100,6 +102,32 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
     c.latest_event_form = filing.get("form")
     c.latest_event_accession = filing.get("accession") or filing.get("filename")
     c.event_type, c.event_proof, c.event_summary = _metadata_event(filing)
+    c.most_recent_filing_date = filing.get('filed')
+    try:
+        resolved = meta if meta.get('security_type') else resolve_security(sec, meta, filing)
+        for key in ('security_type', 'security_title', 'security_source'):
+            setattr(c, key, resolved.get(key, ''))
+    except Exception as exc:
+        c.security_type = 'UNKNOWN'
+        c.data_warnings.append(f'SEC security class review failed: {exc}')
+    if c.security_type != 'COMMON_EQUITY':
+        if c.security_type != 'UNKNOWN' and filing.get('filename'):
+            # Keep the exclusion's filing content inspectable without assigning
+            # corporate common-share counts or market prices to a bond/fund.
+            try:
+                body = sec.submission_text(filing['filename'])
+                c.event_type, c.event_proof, c.event_summary = classify_event(body)
+                c.event_status = event_status(body, c.event_type, c.event_proof)
+                c.event_terms = event_terms(body, c.event_type)
+                c.event_sources = ['https://www.sec.gov/Archives/' + filing['filename']]
+            except Exception as exc:
+                c.event_review_complete = False
+                c.data_warnings.append(f'Excluded security filing content unavailable: {exc}')
+        c.gate_status, reasons = evaluate_gates(c, cfg)
+        c.data_warnings.extend(reasons)
+        c.priority_score = score_candidate(c)
+        c.bucket = bucket_candidate(c)
+        return c
 
     if snapshot:
         for k, v in snapshot.items():
@@ -137,20 +165,54 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
         c.priority_score = score_candidate(c)
         return c
 
+    selected = None
+    reviewed = []
+    try:
+        selected, reviewed, event_warnings = review_material_events(sec, meta['cik'], filing, cfg)
+        c.event_review_complete = not event_warnings and selected is not None
+        c.data_warnings.extend(event_warnings)
+        c.event_history = [{k: x.get(k) for k in ('filed', 'accession', 'event_type', 'event_status', 'terms', 'sources')} for x in reviewed]
+        if selected:
+            filing = selected
+            c.latest_event_date = selected.get('filed')
+            c.latest_event_form = selected.get('form')
+            c.latest_event_accession = selected.get('accession')
+            c.event_type = selected['event_type']
+            c.event_proof = selected['event_proof']
+            c.event_summary = selected['summary']
+            c.event_status = selected['event_status']
+            c.event_terms = selected['terms']
+            c.event_sources = selected['sources']
+            c.event_selection_reason = selected['selection_reason']
+    except Exception as exc:
+        c.event_review_complete = False
+        c.data_warnings.append(f'Material event review failed: {exc}')
+    if c.event_status in {'TERMINAL', 'CANCELLED'}:
+        c.dilution = Dilution(source='Terminal transaction: no active common-equity economics', confidence='low')
+        c.price = c.adv20_usd = None
+        c.gate_status, reasons = evaluate_gates(c, cfg)
+        c.data_warnings.extend(reasons)
+        c.priority_score = score_candidate(c)
+        c.bucket = bucket_candidate(c)
+        return c
+
     txt = ""
     dilution_evidence_complete = False
     try:
-        if filing.get("filename"):
+        if selected:
+            txt = selected['text']
+        elif filing.get("filename"):
             txt = sec.submission_text(filing["filename"])
     except Exception as e:
         c.data_warnings.append(f"Filing-text retrieval error: {e}")
 
     if txt:
         label, proof, summary = classify_event(txt)
-        if label != "OTHER":
+        if label != "OTHER" and not selected:
             c.event_type = label
-        c.event_proof = max(c.event_proof, proof)
-        if summary:
+        if not selected:
+            c.event_proof = max(c.event_proof, proof)
+        if summary and not selected:
             c.event_summary = summary
         for k, v in filing_risk_flags(txt).items():
             setattr(c, k, v)
@@ -192,6 +254,24 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
     elif c.dilution.confidence != "high":
         c.data_warnings.append("Event filing body unavailable; dilution verification incomplete.")
 
+    # Event priority chooses the catalyst, never which capital changes exist.
+    # Financing after the financial filing remains incremental even when a
+    # later routine contract becomes the representative event.
+    for interim in reviewed:
+        if interim.get('accession') == c.latest_event_accession:
+            continue
+        baseline_date = (financial_record or {}).get('report_date') or (financial_record or {}).get('filed', '')
+        if baseline_date and interim.get('filed', '') < baseline_date:
+            continue
+        interim_d, interim_warnings = heuristic_extract_dilution(interim.get('combined_text', ''), common, event_context=True)
+        if interim['terms'].get('warrant_reconciliation_required'):
+            interim_d.confidence = 'low'
+            interim_warnings.append('New warrant tranche requires reconciliation with the financial baseline.')
+        if interim_warnings or any(getattr(interim_d, key) for key in ('pre_funded_shares','warrants_itm_shares','converts_shares','preferred_shares_equiv','sbc_rsus_shares')):
+            c.dilution = conservative_merge_dilution(c.dilution, interim_d)
+            dilution_evidence_complete = dilution_evidence_complete and not interim_warnings
+            c.data_warnings.extend(f"Interim capital event {interim.get('accession')}: {warning}" for warning in interim_warnings)
+
     # Mandatory second pass: read the latest 10-Q/10-K body for notes that often
     # contain warrants, converts, preferreds, SBC, related-party items, liquidity
     # language and subsequent events. Event discovery and financial validation are
@@ -200,7 +280,8 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
     if financial_record and financial_record.get("filename"):
         try:
             financial_text = sec.submission_text(financial_record["filename"])
-            c.financial_review_complete = True
+            if not financial_text.strip():
+                raise ValueError('Financial filing body is empty')
             c.financial_note_hits = financial_note_hits(financial_text)
             cover_common = cover_page_common_shares(financial_text)
             common_resolved_from_cover = common <= 0 and cover_common > 0
@@ -233,10 +314,23 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             c.dilution = conservative_merge_dilution(c.dilution, fin_dilution)
             c.dilution = apply_override(c.dilution, overrides.get(c.ticker, {}))
             c.data_warnings.extend(fin_warnings)
+            c.financial_review_complete = True
         except Exception as e:
             c.data_warnings.append(f"Financial filing second-pass error: {e}")
     else:
         c.data_warnings.append("Latest 10-Q/10-K primary document unavailable.")
+
+    if c.event_terms.get('warrant_reconciliation_required') and c.dilution.confidence != 'high':
+        c.dilution.confidence = 'low'
+        c.data_warnings.append('New event warrant tranche must be reconciled against the financial filing baseline; max() cannot establish the updated total.')
+    if c.event_status == 'LIQUIDATING':
+        last = c.event_terms.get('last_trading_date')
+        from datetime import date
+        if last and date.today().isoformat() > last:
+            c.event_review_complete = False
+            c.data_warnings.append('Planned last trading date has passed; current listing/liquidation status requires a newer source.')
+
+    c.data_warnings = list(dict.fromkeys(c.data_warnings))
 
     c.gate_status, reasons = evaluate_gates(c, cfg)
     c.data_warnings.extend(reasons)
@@ -252,18 +346,21 @@ def scan(days=7, config_path="config/default.json", watchlist_path="config/watch
     latest = {}
 
     for raw in sec.recent_filings(days, cfg["event_forms"]):
-        meta = by_cik.get(str(int(raw["cik"])))
-        if not meta or meta["exchange"] not in cfg["exchanges"]:
+        metas = by_cik.get(str(int(raw["cik"])), [])
+        if not metas:
             continue
         try:
-            filing = sec.enrich_filing(meta["cik"], raw)
+            filing = sec.enrich_filing(metas[0]["cik"], raw)
         except Exception:
             filing = raw
         if not _material(filing, cfg):
             continue
-        t = meta["ticker"]
-        if t not in latest or (filing.get("filed") or "") > (latest[t].get("filed") or ""):
-            latest[t] = filing
+        for meta in metas:
+            if meta['exchange'] not in cfg['exchanges']:
+                continue
+            t = meta['ticker']
+            if t not in latest or (filing.get('filed') or '') > (latest[t].get('filed') or ''):
+                latest[t] = filing
 
     event_forms = set(cfg["event_forms"])
     for t in load_watchlist(watchlist_path):
@@ -276,7 +373,13 @@ def scan(days=7, config_path="config/default.json", watchlist_path="config/watch
         except Exception:
             pass
 
-    snapshots = market_snapshots(list(latest)) if latest else {}
+    for ticker, filing in latest.items():
+        try:
+            by_ticker[ticker] = resolve_security(sec, by_ticker[ticker], filing)
+        except Exception:
+            by_ticker[ticker] = {**by_ticker[ticker], 'security_type': 'UNKNOWN'}
+    eligible = [t for t in latest if by_ticker[t].get('security_type') == 'COMMON_EQUITY']
+    snapshots = market_snapshots(eligible) if eligible else {}
     out = []
     for t, filing in latest.items():
         try:
@@ -285,6 +388,20 @@ def scan(days=7, config_path="config/default.json", watchlist_path="config/watch
             c = Candidate(ticker=t, name=by_ticker[t]["name"], exchange=by_ticker[t]["exchange"], cik=by_ticker[t]["cik"])
             c.data_warnings.append(f"Pipeline error: {e}")
             out.append(c)
+
+    # One issuer can list multiple common classes. Keep the SEC ticker-master's
+    # first verified common class as representative, never a listed note.
+    represented = set()
+    order = {t: i for i, t in enumerate(by_ticker)}
+    for c in sorted(out, key=lambda x: order.get(x.ticker, 10**9)):
+        if c.security_type != 'COMMON_EQUITY':
+            continue
+        if c.cik in represented:
+            c.gate_status = c.bucket = 'EXCLUDED'
+            c.data_warnings.append('Duplicate common class for an issuer already represented in this scan.')
+            c.priority_score = 0
+        else:
+            represented.add(c.cik)
 
     cfg["_sec_discovery_mode"] = sec.last_discovery_mode or os.getenv("SSM_SEC_DISCOVERY_MODE", "auto")
     out.sort(key=lambda c: (c.bucket == "A_RESEARCH_NOW", c.priority_score or -1), reverse=True)

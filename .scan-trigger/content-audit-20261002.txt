@@ -1,0 +1,3 @@
+Rebuild source-backed screening outputs after the 2026-10-02 content audit.
+Verify active LFCR merger/CVR, ELME liquidation dates, security classes,
+terminal mergers, pending stock consideration and interim warrant tranches.

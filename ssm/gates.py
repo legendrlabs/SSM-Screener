@@ -9,6 +9,10 @@ def _age_days(iso_date, today=None):
 
 def evaluate_gates(c: Candidate, cfg):
     reasons=[]
+    if c.security_type not in {'COMMON_EQUITY', 'UNKNOWN'}: return 'EXCLUDED', [f'{c.security_type} security is outside the common-equity universe.']
+    if c.event_status in {'TERMINAL', 'CANCELLED'}: return 'EXCLUDED', [f'Event status {c.event_status}; excluded from active research candidates.']
+    if c.security_type == 'UNKNOWN': return 'DATA_HOLD', ['Listed security type is not verified from SEC registered classes.']
+    if not c.event_review_complete: return 'DATA_HOLD', ['Material event review is incomplete.']
     if c.exchange not in cfg["exchanges"]: return "REJECT", [f"Exchange {c.exchange!r} outside allowed universe."]
     if c.price is None or c.price <= 0: return "DATA_HOLD", ["Missing/stale market price."]
     if c.dilution.common_shares <= 0: return "DATA_HOLD", ["Common shares outstanding not resolved."]
@@ -31,6 +35,7 @@ def evaluate_gates(c: Candidate, cfg):
     elif c.adv20_usd < cfg["adv20_pass_min"]: reasons.append("Liquidity only qualifies for WATCH.")
     if c.event_proof <= 0: return "REJECT", ["No source-backed event proof."]
     if c.event_proof == 1: reasons.append("Event is preliminary/non-binding.")
+    if c.event_status == 'LIQUIDATING': reasons.append('Liquidation in progress; distribution entitlement, due bills and terminal dates require review.')
     fd=c.dilution.fd_ratio
     if fd and fd >= 4: reasons.append(f"Extreme fully diluted overhang ({fd:.1f}x basic).")
     atm=c.atm_ratio()

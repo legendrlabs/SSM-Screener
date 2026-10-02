@@ -8,6 +8,10 @@
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/2137679/000182912626008909/oceanlightacq_8k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/2137679/000182912626008909/oceanlightacq_ex99-1.htm)
 - **INGN** — ASSET_SALE_ACQUISITION / SIGNED / DATA_HOLD. Sale price estimate: $24.8M; Repurchase cap: $45.0M total, increase $15.0M (conditional on closing).
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1294133/000129413326000037/ingn-20260928.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/1294133/000129413326000037/ingn-ex99_1.htm)
+- **ELME** — LIQUIDATION_DISTRIBUTION / LIQUIDATING / WATCH. Distribution: $1.74/share (DECLARED); record_date: 2026-10-09; payment_date: 2026-10-22; ex_dividend_date: 2026-10-23; last_trading_date: 2026-11-05 (planned); dissolution_date: 2026-11-06 (planned); Due bills apply; record date alone does not establish distribution entitlement.
+  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/104894/000010489426000117/elme-20260928.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/104894/000010489426000117/elme-pressreleaseseptember.htm)
+- **LFCR** — MERGER_CASH_CVR / SIGNED / DATA_HOLD. Cash at closing: $6.28/share; CVR: contingent; non-tradable; Full-performance illustration: $9.67; per-share CVR varies, not a fixed guaranteed payout.
+  Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/1005286/000114036126037767/ef20082009_8k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/1005286/000114036126037767/ef20082009_ex99-1.htm), [SEC 3](https://www.sec.gov/Archives/edgar/data/1005286/000114036126037767/ef20082009_ex99-2.htm), [SEC 4](https://www.sec.gov/Archives/edgar/data/1005286/000114036126037767/ef20082009_ex99-3.htm), [SEC 5](https://www.sec.gov/Archives/edgar/data/1005286/000114036126037767/ef20082009_ex99-4.htm)
 - **AEMD** — MERGER_CASH_CVR / SIGNED / DATA_HOLD. CVR: contingent; transfer terms require review.
   Sources: [SEC 1](https://www.sec.gov/Archives/edgar/data/882291/000168316826007206/aethlon_8k.htm), [SEC 2](https://www.sec.gov/Archives/edgar/data/882291/000168316826007206/aethlon_ex9901.htm), [SEC 3](https://www.sec.gov/Archives/edgar/data/882291/000168316826007206/aethlon_ex9902.htm)
 - **ESOA** — ASSET_SALE_ACQUISITION / SIGNED / DATA_HOLD. Pending stock consideration: $3.475M; incremental share count unresolved.
@@ -25,35 +29,36 @@
 
 ## B/C — WATCH
 
-- **ULH** — B_WATCH, DEBT_RESTRUCTURING / SIGNED, score 41. 
+- **ELME** — B_WATCH, LIQUIDATION_DISTRIBUTION / LIQUIDATING, score 50. Liquidation in progress; distribution entitlement, due bills and terminal dates require review.
+- **ULH** — B_WATCH, DEBT_RESTRUCTURING / SIGNED, score 41.0. 
 
 ## DATA HOLD
 
-- **CSV** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 61. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Unresolved share quantity for preferred shares.
-- **BBGI** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 57. Unresolved share quantity for ordinary warrants.; Material dilution language found but no reliable share quantity extracted.; New event warrant tranche requires reconciliation against the outstanding financial baseline.
-- **BSEM** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 57. Interim capital event 0001193125-26-395556: Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for pre-funded warrants.; Unresolved share quantity for convertible debt.
-- **ACCV** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 56. Latest 10-Q/10-K primary document unavailable.; Common shares outstanding not resolved.
-- **INSG** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 54. Unresolved share quantity for convertible debt.; Unresolved share quantity for preferred shares.; Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.
-- **KLXE** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 54. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Unresolved share quantity for ordinary warrants.
-- **SXC** — DATA_HOLD, OTHER / COMPLETED, score 52. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Cap table confidence is low.
-- **OCLT** — DATA_HOLD, LIQUIDATION_DISTRIBUTION / LIQUIDATING, score 52. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Interim capital event 0001829126-26-010594: Material dilution language found but no reliable share quantity extracted.
-- **CTO** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 51. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Unresolved share quantity for ordinary warrants.
-- **INGN** — DATA_HOLD, ASSET_SALE_ACQUISITION / SIGNED, score 50. Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Cap table confidence is low.
+- **CSV** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 61.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Unresolved share quantity for preferred shares.
+- **BBGI** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 57.0. Unresolved share quantity for ordinary warrants.; Material dilution language found but no reliable share quantity extracted.; New event warrant tranche requires reconciliation against the outstanding financial baseline.
+- **BSEM** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 57.0. Interim capital event 0001193125-26-395556: Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for pre-funded warrants.; Unresolved share quantity for convertible debt.
+- **ACCV** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 56.0. Latest 10-Q/10-K primary document unavailable.; Common shares outstanding not resolved.
+- **INSG** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 54.0. Unresolved share quantity for convertible debt.; Unresolved share quantity for preferred shares.; Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.
+- **KLXE** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 54.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Unresolved share quantity for ordinary warrants.
+- **SXC** — DATA_HOLD, OTHER / COMPLETED, score 52.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Cap table confidence is low.
+- **OCLT** — DATA_HOLD, LIQUIDATION_DISTRIBUTION / LIQUIDATING, score 52.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for ordinary warrants.; Interim capital event 0001829126-26-010594: Material dilution language found but no reliable share quantity extracted.
+- **CTO** — DATA_HOLD, ASSET_SALE_ACQUISITION / COMPLETED, score 51.0. Material dilution language found but no reliable share quantity extracted.; Unresolved share quantity for preferred shares.; Unresolved share quantity for ordinary warrants.
+- **INGN** — DATA_HOLD, ASSET_SALE_ACQUISITION / SIGNED, score 50.0. Unresolved outstanding stock awards; options, vesting and share equivalents require reconciliation.; Cap table confidence is low.
 
 ## REJECT
 
-- **MOD** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **THRM** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **HTO** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **LQDT** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **NFG** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **CNP** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **GRND** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61. Market cap above expanded universe ceiling; filing body skipped.
-- **WDAY** — REJECT, FINANCING_DEBT / UNKNOWN, score 34. Market cap above expanded universe ceiling; filing body skipped.
-- **SYNA** — REJECT, MATERIAL_DEFINITIVE_AGREEMENT / UNKNOWN, score 34. Market cap above expanded universe ceiling; filing body skipped.
-- **ON** — REJECT, MATERIAL_DEFINITIVE_AGREEMENT / UNKNOWN, score 34. Market cap above expanded universe ceiling; filing body skipped.
+- **MOD** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **THRM** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **HTO** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **LQDT** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **NFG** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **CNP** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **GRND** — REJECT, ASSET_SALE_ACQUISITION / UNKNOWN, score 61.0. Market cap above expanded universe ceiling; filing body skipped.
+- **WDAY** — REJECT, FINANCING_DEBT / UNKNOWN, score 34.0. Market cap above expanded universe ceiling; filing body skipped.
+- **SYNA** — REJECT, MATERIAL_DEFINITIVE_AGREEMENT / UNKNOWN, score 34.0. Market cap above expanded universe ceiling; filing body skipped.
+- **ON** — REJECT, MATERIAL_DEFINITIVE_AGREEMENT / UNKNOWN, score 34.0. Market cap above expanded universe ceiling; filing body skipped.
 
-## EXCLUDED — 55 securities
+## EXCLUDED — 56 securities
 
 - **RILYG** — DEBT / SIGNED. DEBT security is outside the common-equity universe.
 - **RILYL** — PREFERRED / SIGNED. PREFERRED security is outside the common-equity universe.

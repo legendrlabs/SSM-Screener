@@ -3,23 +3,32 @@
   "sec_discovery_mode": "atom+submissions-watchlist",
   "candidate_count": 320,
   "financial_review_incomplete_count": 65,
-  "data_hold_count": 199,
-  "pass_count": 1,
+  "data_hold_count": 198,
+  "pass_count": 0,
   "watch_count": 1,
-  "reject_count": 63,
+  "reject_count": 65,
   "excluded_count": 56,
   "active_common_count": 214,
-  "source_commit": "55a19e361ab3118e686b8f420ea0d1c103e55a1c",
+  "source_commit": "768297f4dd2bb2d64bae1be66cacd1ee887a5710",
   "workflow_run_id": "36954428800",
-  "generated_at": "2026-10-02T02:31:23.806396+00:00",
-  "generation_mode": "full_scan_plus_sec_submissions_supplement",
+  "generated_at": "2026-10-02T04:05:45.035112+00:00",
+  "generation_mode": "prior_320_snapshot_with_source_verified_content_corrections",
+  "base_snapshot_commit": "0e28205b32cb2f965231dd9fcc98351f5a11bb6f",
   "base_scan_source_commit": "6664cb3c8868dc674ea41545457324b1345bd53f",
   "base_scan_generated_at": "2026-10-02T02:25:35.506384+00:00",
-  "supplemental_tickers": [
+  "base_supplemental_tickers": [
     "LFCR",
     "ELME",
     "BLMN",
     "GREEL"
   ],
-  "supplemental_market_snapshot": "Verified 2026-10-01 closing snapshot from the prior screening output; SEC filings/facts refreshed directly."
+  "content_corrected_tickers": [
+    "OCLT",
+    "AEMD",
+    "ULH",
+    "BLMN"
+  ],
+  "market_snapshot": "Verified 2026-10-01 closing snapshot retained; three corrected issuer pipelines refreshed SEC filings and facts.",
+  "pending_full_scan_workflow_run_id": "36962830987",
+  "full_scan_note": "The first full scan was cancelled at the ubuntu-slim hard 15-minute limit. A standard Ubuntu full scan is running; this snapshot does not claim a completed fresh scan of all 320 rows."
 }

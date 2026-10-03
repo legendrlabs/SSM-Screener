@@ -44,7 +44,7 @@ def merger_parent_name(t):
 def merger_cash_consideration(t):
     """A cash entitlement for common holders, never a financing/conversion price."""
     for clause in sentences(t):
-        entitlement=re.search(r'(?:converted into (?:the )?right to receive|(?:will |shall )?receive)\b',clause,re.I)
+        entitlement=re.search(r'(?:converted into(?: (?:the )?right to receive)?|(?:will |shall )?receive)\b',clause,re.I)
         deal_price=bool(re.search(r'merger agreement.{0,80}?for\s*\$',clause,re.I))
         if not entitlement and not deal_price:continue
         scope=clause[:entitlement.start()] if entitlement else clause

@@ -90,3 +90,15 @@ def test_contractual_optional_redemption_is_not_announced_capital_event():
     text=('The Company may redeem some or all of the Senior Notes at any time at its option. '
           'If the New Notes are redeemed, the Company may repay the New Notes at principal plus interest.')
     assert financial_capital_contexts(text,RECORD)==[]
+
+def test_direct_common_cash_conversion_retains_consideration():
+    text=('Elm Inc. entered into a Merger Agreement with Cedar Inc. '
+          'Each share of common stock will be converted into $33.00 per share in cash.')
+    assert event_terms(text,'MERGER_UNVERIFIED')['cash_per_share_usd']==33
+
+def test_with_proceeds_portion_does_not_mean_partial_retirement():
+    text=('On June 9, 2026, the Company redeemed all outstanding Series D Preferred Stock '
+          'with a portion of the net proceeds from the PIPE.')
+    context=financial_capital_contexts(text,RECORD)[0]['context']
+    assert context['retirements'][0]['whole_instrument'] is True
+    assert context['classification']=='HISTORICAL_INCLUDED'

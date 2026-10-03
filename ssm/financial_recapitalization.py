@@ -10,7 +10,7 @@ from .financial_review import cover_page_common_shares, _cover_plain_text
 from .transactions import iso_date, LEGAL
 
 from .capital_evidence import capital_clauses
-from .recapitalization import Q, MONEY, FX, FUTURE, _action_date, _identity, _retirement_rows, quantity
+from .recapitalization import Q, MONEY, FX, FUTURE, _action_date, _identity, _retirement_rows, _retirement_extent_scope, quantity
 
 ISSUER = r'\b(?:Company|we|registrant|issuer)\b'
 COMMON = r'(?P<shares>'+Q+r')\s+(?:newly issued\s+|new\s+)?shares\s+of\s+(?:(?:the\s+)?Company[’\x27]s\s+|our\s+)?common stock'
@@ -80,7 +80,7 @@ def _retirements(clauses):
             units=re.search(r'\b(?:redeemed|exchanged|converted)\s+('+Q+r')\s+shares of\s+(?:'+object_name+r')',action,re.I)
             row['retired_instrument_units']=quantity(units[1]) if units else None
             if not row['whole_instrument']:
-                extent_scope=re.split(r'\b(?:using|funded by|with proceeds|from proceeds)\b',action,maxsplit=1,flags=re.I)[0]
+                extent_scope=_retirement_extent_scope(action)
                 row['whole_instrument']=False if re.search(r'\bportion\b|\bpartial\w*\b',extent_scope,re.I) else None
             remaining=[]
             for other in clauses:

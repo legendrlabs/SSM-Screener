@@ -3,13 +3,14 @@
   "sec_discovery_mode": "atom",
   "candidate_count": 357,
   "financial_review_incomplete_count": 64,
-  "data_hold_count": 221,
+  "data_hold_count": 222,
   "pass_count": 0,
   "watch_count": 1,
-  "reject_count": 70,
+  "reject_count": 69,
   "excluded_count": 65,
   "active_common_count": 212,
-  "source_commit": "f77ad98b41f3790fc93f5ab5041ed9f1076ee311",
-  "workflow_run_id": "37092176838",
-  "generated_at": "2026-10-03T03:23:58.080799+00:00"
+  "invariant_violation_count": 4,
+  "source_commit": "0cfb6dc01e6aeb6d728ddc6635e528aff0514df0",
+  "workflow_run_id": "37097121353",
+  "generated_at": "2026-10-03T05:12:22.158875+00:00"
 }

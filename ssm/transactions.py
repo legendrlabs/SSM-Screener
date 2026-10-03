@@ -142,6 +142,9 @@ def consideration_amendment_fields(text):
         component=r'(?:merger consideration|cash consideration|stock exchange ratio|exchange ratio|stock consideration|consideration|CVR terms|contingent value rights)'
         if not re.search(action+r'.{0,70}'+component+r'|'+component+r'.{0,70}'+action,clause,re.I):continue
         if re.search(r'\bif\b|\bunless\b|\bwould\b|\bcould\b|\bmay\b|\bshall\b|\bwill be\b|\bin the event\b|\bsubject to\b',clause,re.I):continue
+        if (re.search(r'\bmerger consideration\b.{0,80}\b(?:remains?|remained|is|was)\s+unchanged\b',clause,re.I)
+                or re.search(r'\b(?:did|does|will)\s+not\s+(?:modify|change|amend)\b.{0,80}\bmerger consideration\b',clause,re.I)):
+            continue
         cash=bool(re.search(r'cash consideration',clause,re.I))
         stock=bool(re.search(r'(?:stock )?exchange ratio|stock consideration',clause,re.I))
         cvr=bool(re.search(r'CVR terms|contingent value rights',clause,re.I))

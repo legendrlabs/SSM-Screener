@@ -326,11 +326,15 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
         # Historical financial evidence is read-only: it cannot re-add shares,
         # subtract FD instruments, or rewrite the representative 8-K catalyst.
         try:
-            financial_capital = financial_capital_contexts(financial_text, financial_record, reviewed)
+            c.validation_audit.update(history_common_before=c.dilution.common_shares,history_confidence_before=c.dilution.confidence)
+            financial_capital = financial_capital_contexts(financial_text, financial_record, reviewed,
+                                                         baseline={'share_count_conflict':c.share_count_conflict})
             if financial_capital:
                 c.event_terms['financial_capital_context_history'] = financial_capital
-                c.dilution.confidence = 'low'
-                c.data_warnings.append('Financial filing capital history is read-only; financing links do not certify current post-transaction FD balances.')
+                if any(row['context'].get('reconciliation_required') for row in financial_capital):
+                    c.dilution.confidence = 'low'
+                    c.data_warnings.append('Current financial capital events require FD reconciliation; historical issuance is not re-added and financing links do not waive dilution risk.')
+            c.validation_audit.update(history_common_after=c.dilution.common_shares,history_confidence_after=c.dilution.confidence)
         except Exception as exc:
             c.dilution.confidence = 'low'
             c.event_terms['financial_capital_review_incomplete'] = True

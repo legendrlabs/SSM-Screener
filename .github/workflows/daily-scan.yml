@@ -29,11 +29,23 @@ jobs:
           cache: "pip"
       - run: pip install -e .
       - name: Run screener
+        if: github.event_name != 'push'
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           SSM_MARKET_PROVIDER: yfinance
           SSM_SEC_DISCOVERY_MODE: atom
         run: ssm scan --days 7 --out output
+      - name: Compare generalized rules on the full universe
+        if: github.event_name == 'push'
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          SSM_MARKET_PROVIDER: yfinance
+          SSM_SEC_DISCOVERY_MODE: atom
+        run: |
+          git fetch --no-tags --depth=1 origin 82e674f480a350368bdda5d36d10786f2e962da9
+          mkdir -p "$RUNNER_TEMP/ssm-baseline"
+          git archive FETCH_HEAD ssm | tar -x -C "$RUNNER_TEMP/ssm-baseline"
+          python scripts/audit_scan.py --baseline-source "$RUNNER_TEMP/ssm-baseline" --baseline-commit 82e674f480a350368bdda5d36d10786f2e962da9 --days 7 --out output
       - name: Preserve scan snapshot
         uses: actions/upload-artifact@v4
         with:

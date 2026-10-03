@@ -1,6 +1,7 @@
 from __future__ import annotations
 import csv,json
 from pathlib import Path
+from .validation_audit import summarize_invariants
 
 def _m(x):
     if x is None:return ""
@@ -22,6 +23,7 @@ def _capital_terms(cap):
         parts.append('Capital context: ' + cap['assessment'])
         if 'authorized_capacity_increase' in cap: parts.append(f"Authorized capacity +{cap['authorized_capacity_increase']:,.0f}; capacity alone is not issued shares")
         if cap.get('read_only'):parts.append('Historical financial evidence only; not added to current common/FD')
+        if cap.get('classification'):parts.append(cap['classification']+' / current FD impact: '+cap.get('current_fd_impact','UNKNOWN'))
         if cap.get('source_conflict'):parts.append('Conflicting same-transaction amount/currency or retirement extent; financing link remains UNKNOWN')
         if cap.get('financing_date'):parts.append('Financing completed: '+cap['financing_date'])
         if cap['actual_common_issued'] is not None: parts.append(f"{'Historical' if cap.get('read_only') else 'Actual'} common issued in this {'transaction' if cap.get('read_only') else 'event'}: {cap['actual_common_issued']:,.0f}")
@@ -77,6 +79,8 @@ def _terms(c):
     if t.get('capital_counts_require_reconciliation'): parts.append('Reported capital counts require reconciliation; computed FD economics remain unavailable')
     if 'post_transaction_ticker' in t: parts.append(f"Post-merger ticker: {t['post_transaction_ticker']}")
     if 'merger_terms_source_date' in t: parts.append(f"Consideration retained from the {t['merger_terms_source_date']} same-counterparty agreement; latest regulatory update retained")
+    if t.get('closing_evidence'):parts.append('Actual transaction closing: '+t.get('transaction_date','date unresolved')+'; lifecycle source '+str(t.get('lifecycle_source_accession','unresolved')))
+    if t.get('economics_reconciliation_required'):parts.append('Revised transaction economics unresolved; earlier affected terms invalidated')
     if t.get('cvr_conditional'):
         parts.append('CVR: contingent; ' + ('non-tradable' if t.get('cvr_transferable') is False else 'transfer terms require review'))
     if 'illustrative_total_per_share_usd' in t: parts.append(f"Full-performance illustration: ${t['illustrative_total_per_share_usd']:.2f}; per-share CVR varies, not a fixed guaranteed payout")
@@ -105,7 +109,7 @@ def write_outputs(candidates,cfg,out_dir):
             d['fd_ratio']=None
             for key in dil: dil[key]=None
         d.update({f"dilution_{k}":v for k,v in dil.items()})
-        for key in ('event_terms','event_sources','event_history'): d[key]=json.dumps(d[key],ensure_ascii=False,sort_keys=True)
+        for key in ('event_terms','event_sources','event_history','validation_audit'): d[key]=json.dumps(d[key],ensure_ascii=False,sort_keys=True)
         d["data_warnings"]=" | ".join(d.get("data_warnings") or []); flat.append(d)
     if flat:
         with (out/"candidates.csv").open("w",newline="",encoding="utf-8-sig") as f: w=csv.DictWriter(f,fieldnames=list(flat[0].keys()));w.writeheader();w.writerows(flat)
@@ -126,6 +130,9 @@ def write_outputs(candidates,cfg,out_dir):
     q['excluded_count']=sum(c.gate_status=='EXCLUDED' for c in candidates)
     q['active_common_count']=sum(_active_common(c) for c in candidates)
     q['financial_review_incomplete_count']=sum(_active_common(c) and not c.financial_review_complete for c in candidates)
+    audit=summarize_invariants(candidates)
+    q['invariant_violation_count']=sum(r['violations'] for r in audit['invariants'].values())
+    (out/'validation_audit.json').write_text(json.dumps(audit,indent=2),encoding='utf-8')
     (out/"quality.json").write_text(json.dumps(q,indent=2),encoding="utf-8")
     top=[c for c in candidates if c.bucket=="A_RESEARCH_NOW"][:cfg["max_candidates"]]; watch=[c for c in candidates if c.bucket in ("B_WATCH","C_SPECULATIVE")][:10]; reject=[c for c in candidates if c.bucket=="REJECT"][:10]; hold=[c for c in candidates if c.bucket=="DATA_HOLD"][:10]
     md=["# Special Situation Microcap — latest","",f"**SAFE_TO_ACT: {'TRUE' if safe else 'FALSE'}**",""]

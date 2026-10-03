@@ -2,6 +2,7 @@ from __future__ import annotations
 import re
 from typing import Tuple
 from .financial_review import visible_filing_text
+from .transactions import closing_evidence, reverse_structure, sentences
 
 
 def operative_text(text: str) -> str:
@@ -14,7 +15,7 @@ def operative_text(text: str) -> str:
     return t
 
 EVENT_KEYWORDS = {
-    "MERGER_REVERSE_MERGER": [r"\bmerger agreement\b", r"\breverse merger\b", r"\bbusiness combination\b", r"\bmerger consideration\b"],
+    "MERGER_UNVERIFIED": [r"\bmerger agreement\b", r"\breverse merger\b", r"\bbusiness combination\b", r"\bmerger consideration\b", r"agreement and plan of merger"],
     "ASSET_SALE_ACQUISITION": [r"\bacquisition\b", r"\bacquire[sd]?\b", r"\basset sale\b", r"\bdisposition\b", r"\bpurchase agreement\b"],
     "STRATEGIC_INVESTMENT_PIPE": [r"\bstrategic investment\b", r"\bprivate placement\b", r"\bpipe\b", r"\bsecurities purchase agreement\b"],
     "DEBT_RESTRUCTURING": [r"\bredemption\b", r"\brefinanc", r"\bdebt repayment\b", r"\bdebt extinguish", r"\bnotes? repaid\b"],
@@ -24,14 +25,12 @@ EVENT_KEYWORDS = {
 }
 
 MERGER_KINDS = {'MERGER_REVERSE_MERGER', 'MERGER_CASH_CVR', 'REVERSE_MERGER_CVR',
-                'MERGER_CVR_UNVERIFIED', 'MERGER_CASH_STOCK', 'MERGER_STOCK'}
+                'MERGER_CVR_UNVERIFIED', 'MERGER_CASH_STOCK', 'MERGER_STOCK',
+                'MERGER_CASH','MERGER_STOCK_CVR','MERGER_UNVERIFIED','REVERSE_MERGER'}
 
 
 def completed_merger(t):
-    return any(
-        re.search(r'\b(?:closed|completed|consummated)\s+(?:(?:the|its|their|previously|announced)\s+)*(?:merger|business combination)\b|\b(?:merger|business combination)\s+(?:(?:has|have) (?:been )?|was |is now )?(?:successfully )?(?:closed|completed|consummated)\b|\bannounc(?:ed|es|ing)\s+(?:the )?(?:closing|completion|consummation)\s+of\s+(?:(?:the|its|their|previously|announced)\s+)*(?:merger|business combination)\b', sentence, re.I)
-        and not re.search(r'\bif\b|\bnot\b|\bwill\b|\bwould\b|\bmay\b|\bexpected\b|\banticipat\w*\b|\bpending\b|\bremains\b|\bto be (?:closed|completed|consummated)\b|\bsubject to\b|\bfiling\b|\bregistration statement\b|\bscheduled\b|\bplanned (?:for|to)\b|\bslated (?:for|to)\b', sentence, re.I)
-        for sentence in re.split(r'(?<=[.;])\s+', t))
+    return bool(closing_evidence(t))
 
 
 def merger_parent_name(t):
@@ -140,7 +139,8 @@ def classify_event(text: str, *, cleaned=False) -> Tuple[str, int, str]:
     anchor = None
     if terminal:
         anchor = 'TERMINAL_MERGER'
-    elif re.search(r'(?:has |have |company |parties )terminated.{0,40}(?:merger|business combination) agreement|(?:merger|business combination) agreement (?:was|has been) terminated', t[:2500]):
+    elif any(re.search(r'(?:has |have |company |parties )terminated.{0,40}(?:merger|business combination) agreement|(?:merger|business combination) agreement (?:was|has been) terminated',clause)
+             and not re.search(r'\bif\b|\bwould\b|\bwill\b|\bmay\b|\bnot\b|\bsubject to\b',clause) for clause in sentences(t)):
         anchor = 'MERGER_TERMINATED'
     elif current_liquidation(t):
         anchor = 'LIQUIDATION_DISTRIBUTION'
@@ -149,13 +149,24 @@ def classify_event(text: str, *, cleaned=False) -> Tuple[str, int, str]:
     elif resale_registration(t):
         anchor = 'LISTING_CAPITAL_STRUCTURE'
     elif re.search(r'merger agreement|agreement and plan of merger|to be acquired', t) and re.search(r'contingent value right|\bcvr\b', t):
-        anchor = {'STOCK': 'REVERSE_MERGER_CVR', 'CASH': 'MERGER_CASH_CVR', 'UNVERIFIED': 'MERGER_CVR_UNVERIFIED'}[merger_consideration(t)]
+        structure={}
+        legacy=re.search(r'pre[- ]merger (?:company|parent) stockholders.{0,180}?approximately\s*([\d.]+)%',t)
+        target=re.search(r'stockholders\s*\(inclusive of investors in the private placement\).{0,180}?approximately\s*([\d.]+)%',t)
+        if legacy:structure['legacy_holder_ownership_pct']=float(legacy[1])
+        if target:structure['target_and_financing_ownership_pct']=float(target[1])
+        stock_kind='REVERSE_MERGER_CVR' if reverse_structure(t,structure) else 'MERGER_STOCK_CVR'
+        anchor = {'STOCK':stock_kind, 'CASH': 'MERGER_CASH_CVR', 'UNVERIFIED': 'MERGER_CVR_UNVERIFIED'}[merger_consideration(t)]
     elif completed_merger(t):
-        anchor = 'MERGER_REVERSE_MERGER'
+        payout=merger_share_consideration(t)
+        anchor='MERGER_CASH_STOCK' if payout.get('consideration_type')=='CASH_AND_STOCK' else 'MERGER_STOCK' if payout else 'MERGER_CASH' if merger_consideration(t)=='CASH' else 'MERGER_UNVERIFIED'
     elif (re.search(r'merger agreement|agreement and plan of merger', t)
           and not re.search(r'\bspac\b|special purpose acquisition|reverse merger', t)
           and merger_share_consideration(t)):
         anchor = 'MERGER_CASH_STOCK' if merger_share_consideration(t)['consideration_type'] == 'CASH_AND_STOCK' else 'MERGER_STOCK'
+    elif re.search(r'merger agreement|agreement and plan of merger',t) and merger_consideration(t)=='CASH':
+        anchor='MERGER_CASH'
+    elif reverse_structure(t,{}):
+        anchor='REVERSE_MERGER'
     elif re.search(r'(?:consummated|completed|closed).{0,100}initial public offering', t):
         anchor = 'IPO_COMPLETED'
     elif re.search(r'(?:entered into|amends and restates|executed|amended).{0,300}(?:credit(?: and security)? agreement|loan agreement)', t):

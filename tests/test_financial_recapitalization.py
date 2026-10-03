@@ -122,7 +122,8 @@ def test_undated_financing_reference_cannot_join_an_8k_to_old_retirement():
            'combined_text':ISSUE,'terms':{}}
     rows=review(q,events=[event])
     assert rows and rows[0]['context']['link_verification']=='UNKNOWN'
-    assert rows[0]['context']['actual_common_issued'] is None
+    assert rows[0]['context']['actual_common_issued']==0
+    assert rows[0]['context']['issuance_type']=='NONE'
 
 
 def test_acquisition_completion_date_is_not_a_financing_closing_date():
@@ -132,7 +133,8 @@ def test_acquisition_completion_date_is_not_a_financing_closing_date():
            'combined_text':ISSUE,'terms':{}}
     rows=review(q,events=[event])
     assert rows[0]['context']['link_verification']=='UNKNOWN'
-    assert rows[0]['context']['actual_common_issued'] is None
+    assert rows[0]['context']['actual_common_issued']==0
+    assert rows[0]['context']['issuance_type']=='NONE'
 
 
 def test_foreign_cash_is_preserved_and_never_a_usd_claim_reduction():
@@ -143,9 +145,11 @@ def test_foreign_cash_is_preserved_and_never_a_usd_claim_reduction():
 
 def test_unnamed_debt_retirement_stays_visible_and_unverified():
     rows=review('Note 8. Debt. '+ISSUE+' On August 5, 2026, the Company repaid $10 million of debt.')
-    assert rows[0]['context']['retirements'][0]['claim_amount']==10e6
-    assert rows[0]['context']['retirements'][0]['identity'] is None
-    assert rows[0]['context']['link_verification']=='UNKNOWN'
+    retirement=next(row['context'] for row in rows if row['context']['retirements'])
+    assert retirement['retirements'][0]['claim_amount']==10e6
+    assert retirement['retirements'][0]['identity'] is None
+    assert retirement['link_verification']=='UNKNOWN'
+    assert rows[0]['context']['retirements']==[]
 
 
 def test_conflicting_same_transaction_currency_cannot_confirm_a_recapitalization():

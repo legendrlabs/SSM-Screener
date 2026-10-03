@@ -49,6 +49,7 @@ class Candidate:
     event_terms: Dict = field(default_factory=dict)
     event_sources: List[str] = field(default_factory=list)
     event_history: List[Dict] = field(default_factory=list)
+    validation_audit: Dict = field(default_factory=dict)
     event_review_complete: bool = True
     event_selection_reason: str = ''
     most_recent_filing_date: Optional[str] = None

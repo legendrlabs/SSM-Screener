@@ -43,8 +43,10 @@ def _retirement_rows(clause, issuer):
     for index, part in enumerate(parts):
         if index and inherit and re.match(ACTION, part, re.I):
             part = 'The Company ' + part
+        # Optional indenture rights are not an announced redemption decision.
+        if re.search(r'\bmay\s+(?:redeem|repay|convert|exchange)|\bat its option\b|\bright to redeem\b',part,re.I) and not re.search(r'\bwill\s+(?:redeem|repay)|\b(?:intends|plans)\s+to\s+(?:redeem|repay)|\b(?:issued|delivered)\s+(?:a\s+)?notice of redemption\b',part,re.I):continue
         identity = _identity(part)
-        liability = re.search(r'preferred (?:stock|shares)|\bdebt\b|\bnotes\b|\bloan\b|\bdebentures\b', part, re.I)
+        liability = re.search(r'preferred (?:stock|shares)|\bdebt\b|\bnotes\b|\bloan\b|\bdebentures\b|\bRBL\b|\bcredit facility\b', part, re.I)
         passive = re.search(r'all (?:of the )?(?:outstanding|then-outstanding).{0,100}?(?:was|were|has been|have been)\s+(?:extinguished|redeemed|converted|exchanged)', part, re.I)
         if not liability or not (re.search(direct, part, re.I) or passive):
             continue
@@ -56,9 +58,11 @@ def _retirement_rows(clause, issuer):
         amount = quantity(money['amount']+' '+(money['unit'] or '')) if money else None
         currency = FX.get(money['currency'].upper(), 'UNVERIFIED') if money else None
         object_name = re.escape(identity) if identity else re.escape(liability[0])
-        whole = bool(re.search(r'all\s+(?:of\s+the\s+)?(?:outstanding|then-outstanding)\s+'+object_name, part, re.I)
-                     or re.search(object_name+r'\s+(?:(?:was|were)\s+)?(?:redeemed|repaid|extinguished|converted|exchanged)\s+in full', part, re.I))
-        if re.search(r'\b(?:portion|partial|partially)\b', part, re.I):
+        extent_scope=re.split(r'\b(?:using|funded by|with proceeds|from proceeds)\b',part,maxsplit=1,flags=re.I)[0]
+        whole = bool(re.search(r'all\s+(?:of\s+the\s+)?(?:outstanding|then-outstanding)\s+'+object_name, extent_scope, re.I)
+                     or re.search(object_name+r'\s+(?:(?:was|were)\s+)?(?:redeemed|repaid|extinguished|converted|exchanged)\s+in full', extent_scope, re.I)
+                     or re.search(r'\b(?:redeemed|repaid|paid off|extinguished)\s+in full\b',extent_scope,re.I))
+        if re.search(r'\b(?:portion|partial|partially)\b', extent_scope, re.I):
             whole = False
         yield {'instrument_type':typ, 'identity':identity, 'status':status,
                'claim_amount':amount, 'currency':currency, 'whole_instrument':whole,

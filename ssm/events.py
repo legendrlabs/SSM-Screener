@@ -4,7 +4,7 @@ import re
 from .recapitalization import capital_context
 from .transactions import reduce_transactions, normalized_kind, closing_evidence, sentences
 
-from .event_rules import classify_event, operative_text, liquidation_evidence, adopted_rights_plan, resale_registration, closed_debt_equity_exchange, merger_share_consideration, merger_parent_name, completed_merger, MERGER_KINDS
+from .event_rules import classify_event, operative_text, liquidation_evidence, adopted_rights_plan, resale_registration, closed_debt_equity_exchange, merger_share_consideration, merger_cash_consideration, merger_parent_name, completed_merger, MERGER_KINDS
 
 PRIORITY = {'TERMINAL_MERGER': 110, 'MERGER_TERMINATED': 105,
             'LIQUIDATION_DISTRIBUTION': 100, 'MERGER_CASH_CVR': 90, 'REVERSE_MERGER_CVR': 90, 'MERGER_CVR_UNVERIFIED': 85,
@@ -46,9 +46,7 @@ def event_terms(text, kind, *, cleaned=False):
     t = text if cleaned else operative_text(text)
     terms = {}
     if kind in MERGER_KINDS | {'TERMINAL_MERGER'}:
-        cash = re.search(r'\$\s*(\d+(?:\.\d+)?)\s+per share.{0,45}?in cash', t, re.I)
-        if not cash:
-            cash = re.search(r'converted into.{0,100}?\$\s*(\d+(?:\.\d+)?)\s+(?:cash|per share)', t, re.I)
+        cash = merger_cash_consideration(t)
         specialized=list(re.finditer(r'cash consideration per common share (?:was |is )?(?:increased|decreased|changed|revised) to\s*\$\s*(\d+(?:\.\d+)?)',t,re.I))
         revised=list(re.finditer(r'(?:amended|revised|changed|increased|decreased).{0,60}(?:merger consideration|cash consideration).{0,20}?to\s*\$\s*(\d+(?:\.\d+)?)\s+per (?:common )?share\s+in cash',t,re.I))
         cash_updates=sorted(specialized+revised,key=lambda m:m.start())
@@ -283,7 +281,8 @@ def _read_event_filing(sec, cik, filing):
                 term_sources.append(doc['url'])
                 if doc['type'].startswith('EX-99'):lifecycle_narratives.append(operative_text(exhibit))
     narrative = '\n'.join(narratives)
-    label, proof, summary = classify_event(narrative, cleaned=True)
+    lifecycle='\n'.join(lifecycle_narratives)
+    label, proof, summary = classify_event(lifecycle, cleaned=True)
     terms=event_terms(narrative,label,cleaned=True)
     label=normalized_kind(label,terms,narrative)
     lifecycle='\n'.join(lifecycle_narratives)

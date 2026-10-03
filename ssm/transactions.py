@@ -91,6 +91,7 @@ def closing_evidence(text,deal_family='MERGER'):
     for clause in sentences(text):
         hit=re.search(action,clause,re.I)
         if not hit:continue
+        if re.search(r'became\s+a\s+wholly owned subsidiary',hit[0],re.I) and not re.search(r'\bmerger\b|\bbusiness combination\b',clause,re.I):continue
         if re.search(r'\btransaction\b',hit[0],re.I):
             reference=re.search(r'(?:contemplated by|under|pursuant to|in connection with)\s+(?:the\s+)?([^.;]{1,90}?Agreement)\b',clause[hit.end():],re.I)
             expected=r'\b(?:Merger|Business Combination) Agreement\b|Agreement and Plan of Merger' if deal_family=='MERGER' else r'\b(?:Asset Purchase|Stock Purchase|Purchase) Agreement\b'
@@ -133,6 +134,23 @@ def normalized_kind(kind,terms,text):
     if stock:return 'MERGER_STOCK_CVR' if cvr else 'MERGER_STOCK'
     return 'MERGER_CVR_UNVERIFIED' if cvr else 'MERGER_UNVERIFIED'
 
+def consideration_amendment_fields(text):
+    """Enacted revisions affect named components; adjustment mechanics do not."""
+    changed=set()
+    for clause in sentences(text):
+        action=r'\b(?:amended|amendment|revised|changed|increased|decreased)\b'
+        component=r'(?:merger consideration|cash consideration|stock exchange ratio|exchange ratio|stock consideration|consideration|CVR terms|contingent value rights)'
+        if not re.search(action+r'.{0,70}'+component+r'|'+component+r'.{0,70}'+action,clause,re.I):continue
+        if re.search(r'\bif\b|\bunless\b|\bwould\b|\bcould\b|\bmay\b|\bshall\b|\bwill be\b|\bin the event\b|\bsubject to\b',clause,re.I):continue
+        cash=bool(re.search(r'cash consideration',clause,re.I))
+        stock=bool(re.search(r'(?:stock )?exchange ratio|stock consideration',clause,re.I))
+        cvr=bool(re.search(r'CVR terms|contingent value rights',clause,re.I))
+        if cash:changed.update({'cash_per_share_usd','cash_per_share_status','cash_adjustment_direction','cash_adjustment_basis','illustrative_total_per_share_usd'})
+        if stock:changed.update({'stock_exchange_ratio','stock_consideration_security','stock_consideration_ticker'})
+        if cvr:changed.update({'cvr_conditional','cvr_transferable','cvr_basis','cvr_distribution_status','cvr_terms','illustrative_total_per_share_usd'})
+        if not (cash or stock or cvr):changed.update(PAYOUT_FIELDS)
+    return changed
+
 def reduce_transactions(reviewed):
     groups=[];ordinary=[]
     for row in sorted(reviewed,key=lambda r:(r.get('filed',''),r.get('accession',''))):
@@ -152,9 +170,9 @@ def reduce_transactions(reviewed):
         for row in group:
             text=row.get('narrative') or row.get('combined_text') or row.get('text') or ''
             terms=row.get('terms',{})
-            amended=bool(re.search(r'(?:amend\w*|revis\w*|changed).{0,45}(?:merger consideration|cash consideration|stock exchange ratio|consideration)|(?:consideration|exchange ratio).{0,45}(?:amend\w*|revis\w*|changed|increased|decreased)',text,re.I))
+            changed=consideration_amendment_fields(text)
+            amended=bool(changed)
             if amended:
-                changed=set(PAYOUT_FIELDS)
                 if re.search(r'stock exchange ratio.{0,25}(?:unchanged|remains the same)',text,re.I):
                     changed-={'stock_exchange_ratio','stock_consideration_security','stock_consideration_ticker','consideration_type'}
                 if re.search(r'cash consideration.{0,25}(?:unchanged|remains the same)',text,re.I):

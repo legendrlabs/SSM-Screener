@@ -37,9 +37,13 @@ def test_enacted_cash_only_revision_keeps_unaffected_stock():
     assert 'cash_per_share_usd' not in selected['terms']
     assert selected['terms']['stock_exchange_ratio']==.4735
 
-def test_financing_price_is_not_common_holder_merger_consideration():
+@pytest.mark.parametrize('financing',[
+    'In 2025, the Company sold preferred stock for $1.65 per share in cash.',
+    'The SAFEs were converted into preferred stock at $1.65 per share.',
+])
+def test_financing_price_is_not_common_holder_merger_consideration(financing):
     text=('The Company completed its business combination on May 7, 2026. '
-          'In 2025, the Company sold preferred stock for $1.65 per share in cash.')
+          +financing)
     assert 'cash_per_share_usd' not in event_terms(text,'MERGER_UNVERIFIED')
 
 def test_issuer_signed_merger_is_not_replaced_by_target_asset_acquisition():

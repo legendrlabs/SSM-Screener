@@ -41,6 +41,29 @@ def merger_parent_name(t):
 
 
 
+def merger_cash_consideration(t):
+    """A cash entitlement for common holders, never a financing/conversion price."""
+    for clause in sentences(t):
+        entitlement=re.search(r'(?:converted into (?:the )?right to receive|(?:will |shall )?receive)\b',clause,re.I)
+        deal_price=bool(re.search(r'merger agreement.{0,80}?for\s*\$',clause,re.I))
+        if not entitlement and not deal_price:continue
+        scope=clause[:entitlement.start()] if entitlement else clause
+        holders=list(re.finditer(r'\beach (?:outstanding )?share\b|\b(?:common )?(?:shareholders|stockholders)\b',scope,re.I))
+        if not holders and not deal_price:continue
+        holder=scope[holders[-1].start():] if holders else ''
+        if holders and (re.search(r'preferred|warrant|option|award|SAFE',holder,re.I) or not re.search(r'common stock|common (?:shareholders|stockholders)',holder,re.I)):continue
+        payout=clause[entitlement.end():] if entitlement else clause
+        payout=re.split(r'\beach (?:outstanding |unvested |vested )?(?:option|warrant|award|restricted stock)\b',payout,maxsplit=1,flags=re.I)[0]
+        cash=re.search(r'\$\s*(\d+(?:\.\d+)?)\s+(?:per (?:common )?share\s+)?(?:in )?cash\b',payout,re.I)
+        if cash and not re.search(r'cash in lieu of fractional',payout[:cash.end()],re.I):return cash
+    return None
+
+def signed_merger_agreement(t):
+    for clause in sentences(t):
+        if not re.search(r'(?:entered into|executed|signed).{0,300}(?:merger agreement|agreement and plan of merger|business combination agreement)',clause,re.I):continue
+        if not re.search(r'\bif\b|\bwould\b|\bcould\b|\bmay\b|\bexpects? to enter\b|\bplans? to enter\b',clause,re.I):return True
+    return False
+
 def merger_share_consideration(t):
     """Common-holder exchange terms; cash for awards/fractions is not deal cash."""
     for clause in re.split(r'(?<=[.;])\s+', t):
@@ -126,7 +149,7 @@ def merger_consideration(t):
     # Financing proceeds and fractional-share cash are not cash merger prices.
     if re.search(r'all[- ]stock|stock[- ]for[- ]stock', t):
         return 'STOCK'
-    if re.search(r'\$\s*\d+(?:\.\d+)?\s+(?:per share.{0,45}?in cash|in cash.{0,45}?per share)', t) or re.search(r'(?:shareholders|stockholders).{0,100}receive\s*\$\s*\d+(?:\.\d+)?\s+in cash', t):
+    if merger_cash_consideration(t):
         return 'CASH'
     if re.search(r'exchange ratio|converted into.{0,80}(?:shares of common stock|ordinary shares)', t):
         return 'STOCK'
@@ -167,6 +190,8 @@ def classify_event(text: str, *, cleaned=False) -> Tuple[str, int, str]:
         anchor='MERGER_CASH'
     elif reverse_structure(t,{}):
         anchor='REVERSE_MERGER'
+    elif signed_merger_agreement(t):
+        anchor='MERGER_UNVERIFIED'
     elif re.search(r'(?:consummated|completed|closed).{0,100}initial public offering', t):
         anchor = 'IPO_COMPLETED'
     elif re.search(r'(?:entered into|amends and restates|executed|amended).{0,300}(?:credit(?: and security)? agreement|loan agreement)', t):

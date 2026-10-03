@@ -80,7 +80,8 @@ def _retirements(clauses):
             units=re.search(r'\b(?:redeemed|exchanged|converted)\s+('+Q+r')\s+shares of\s+(?:'+object_name+r')',action,re.I)
             row['retired_instrument_units']=quantity(units[1]) if units else None
             if not row['whole_instrument']:
-                row['whole_instrument']=False if re.search(r'\bportion\b|\bpartial\w*\b',action,re.I) else None
+                extent_scope=re.split(r'\b(?:using|funded by|with proceeds|from proceeds)\b',action,maxsplit=1,flags=re.I)[0]
+                row['whole_instrument']=False if re.search(r'\bportion\b|\bpartial\w*\b',extent_scope,re.I) else None
             remaining=[]
             for other in clauses:
                 if not row['identity'] or _canonical(_identity(other))!=row['identity'] or _action_date(other)!=row['transaction_date']:continue
@@ -99,6 +100,7 @@ def _retirements(clauses):
                     row['whole_instrument']=None
             if len(balances)>1:row['whole_instrument']=None
             key=tuple(row.get(k) for k in ('transaction_date','identity','status','claim_amount','cash_paid','currency','whole_instrument'))
+            if not row['identity']:key+=(re.sub(r'\s+',' ',clause).strip().lower(),)
             found[key]=row
     return list(found.values())
 
@@ -272,9 +274,13 @@ def financial_capital_contexts(text, financial_record, events=(), *, baseline=No
                    'financing_identity':issue.get('financing_identity')}
         if issue.get('retirement_only'):
             event_key['retirement']={k:issue['retirement_only'].get(k) for k in ('identity','claim_amount','cash_paid','currency','retired_instrument_units')}
+            if not issue['retirement_only'].get('identity') or not issue['date']:
+                event_key['retirement']['unresolved_identity_evidence']=re.sub(r'\s+',' ',issue['retirement_only']['evidence']).strip().lower()
         event_id=hashlib.sha256(json.dumps(event_key,sort_keys=True).encode()).hexdigest()[:20]
         for row in context['retirements']:
             key={k:row.get(k) for k in ('transaction_date','identity','instrument_type','claim_amount','cash_paid','currency','retired_instrument_units')}
+            if not row.get('identity') or not row.get('transaction_date'):
+                key['unresolved_identity_evidence']=re.sub(r'\s+',' ',row['evidence']).strip().lower()
             row['retirement_event_id']=hashlib.sha256(json.dumps(key,sort_keys=True).encode()).hexdigest()[:20]
         _classify_current_impact(context,financial_record,baseline,retired,clauses)
         records.append({'capital_event_id':event_id,'accession':financial_record.get('accession'),'filed':financial_record.get('filed'),

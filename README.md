@@ -40,6 +40,9 @@
 
 예정 발행·상환은 완료로 처리하지 않으며, common/pre-funded warrant 배분이나 거래 후 cap table이 불명확하면 DATA_HOLD를 유지합니다. 재자본화 문맥은 희석 경고를 없애거나 PASS로 승격시키지 않습니다. [문맥 추출 및 검증 범위](docs/recapitalization-context.md)를 참고하세요.
 
+최신 10-Q/10-K의 자본구조·subsequent events 및 관련 자금사용 문맥도 read-only로 보완 검토합니다. 명시적인 거래 날짜·증권·금액·전량/부분 상환 결과와 financing 연결이 맞을 때만 과거 재자본화 이력으로 표시합니다. 금융공시에서 발견한 과거 발행을 현재 common에 재가산하거나 기존 FD 잔액에서 차감하지 않습니다. 8-K와 반복된 거래는 합산하지 않고 근거 링크를 대조하며, 과거 이력은 현재 catalyst와 별도 섹션에 표시합니다.
+
+
 
 SEC cover의 등록 증권 종류와 티커를 먼저 연결합니다. 같은 CIK의 보통주·상장 채권·preferred·워런트를 분리하고, ETF 및 비보통주 증권은 `EXCLUDED`로 남깁니다. 확인되지 않은 증권은 `DATA_HOLD`이며 회사 보통주 수를 임의로 적용하지 않습니다.
 

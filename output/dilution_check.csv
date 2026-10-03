@@ -18,8 +18,8 @@ ECHO,0.0,,,,,,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing p
 ANGX,0.0,,,,,,,0.0,,low,heuristic filing-text parser + EX-2.1 exhibit parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
 CDNL,0.0,,,,,,,0.0,,low,heuristic filing-text parser + 10-Q second-pass filing parser
 INGN,26538337.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
-CBNK,16290456.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + EX-99.2 exhibit parser + 10-Q second-pass filing parser
 KLXE,21273059.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + EX-4.1 exhibit parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
+CBNK,16290456.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + EX-2.1 exhibit parser + EX-10.1 exhibit parser + EX-99.1 exhibit parser + EX-99.2 exhibit parser + 10-Q second-pass filing parser
 THRMV,,,,,,,,,,,Excluded: capital metrics are not applicable
 AIB,75979466.0,,,,,,,0.0,0.0,low,heuristic filing-text parser + 10-Q second-pass filing parser
 MRDN,12669479.0,,,,,,,16900000.0,0.11162463460377202,low,heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser
@@ -353,6 +353,6 @@ FACTU,,,,,,,,,,,Excluded: capital metrics are not applicable
 FACTW,,,,,,,,,,,Excluded: capital metrics are not applicable
 SVCCU,,,,,,,,,,,Excluded: capital metrics are not applicable
 SVCCW,,,,,,,,,,,Excluded: capital metrics are not applicable
-GREEL,,,,,,,,,,,Excluded: capital metrics are not applicable
 ZCSH,,,,,,,,,,,Excluded: capital metrics are not applicable
+GREEL,,,,,,,,,,,Excluded: capital metrics are not applicable
 LIDR,46488312.0,,,,,,,70400000.0,1.3521063657792127,low,heuristic filing-text parser + heuristic filing-text parser + heuristic filing-text parser + 10-Q second-pass filing parser

@@ -1,16 +1,16 @@
 {
   "SAFE_TO_ACT": false,
   "sec_discovery_mode": "atom",
-  "candidate_count": 389,
-  "financial_review_incomplete_count": 73,
-  "data_hold_count": 241,
+  "candidate_count": 504,
+  "financial_review_incomplete_count": 96,
+  "data_hold_count": 299,
   "pass_count": 0,
   "watch_count": 1,
-  "reject_count": 76,
-  "excluded_count": 71,
-  "active_common_count": 232,
+  "reject_count": 107,
+  "excluded_count": 97,
+  "active_common_count": 301,
   "invariant_violation_count": 0,
-  "source_commit": "509e220371cfeb480fe658b683691718cfc13cbd",
-  "workflow_run_id": "37304632559",
-  "generated_at": "2026-10-05T12:10:30.995361+00:00"
+  "source_commit": "df888d999767ab3fb5ffd8f787c6ec0be9537f31",
+  "workflow_run_id": "37383686246",
+  "generated_at": "2026-10-05T23:16:09.810825+00:00"
 }

@@ -79,3 +79,25 @@ def test_cash_stock_merger_and_warrant_issuer_remain_data_hold(tmp_path):
     q = json.loads((tmp_path / "quality.json").read_text())
     assert q["pass_count"] == 0 and q["data_hold_count"] == 2
     assert q["SAFE_TO_ACT"] is False
+
+
+def test_generic_preliminary_other_is_not_promoted_to_watch():
+    from datetime import date
+    from ssm.gates import evaluate_gates
+    c = Candidate(
+        ticker="GENERIC", exchange="Nasdaq", price=3, adv20_usd=500_000,
+        event_type="OTHER", event_status="PRELIMINARY", event_proof=1,
+        latest_event_date=date.today().isoformat(),
+        latest_financial_filing_date=date.today().isoformat(),
+        financial_review_complete=True,
+        dilution=Dilution(common_shares=10_000_000, confidence="medium"),
+    )
+    cfg={"exchanges":["Nasdaq"],"market_cap_min":1,"market_cap_max":500_000_000,
+         "market_cap_expand_max":1_000_000_000,"event_max_age_days":90,
+         "financial_filing_max_age_days":210,"adv20_watch_min":50_000,
+         "adv20_pass_min":250_000}
+    status, reasons = evaluate_gates(c, cfg)
+    assert status == "REJECT"
+    assert any("structural" in x for x in reasons)
+    c.event_type = "MERGER_UNVERIFIED"
+    assert evaluate_gates(c, cfg)[0] == "WATCH"

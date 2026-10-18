@@ -23,6 +23,11 @@ def evaluate_gates(c: Candidate, cfg):
     if any(x.get('context', {}).get('reconciliation_required') for x in c.event_terms.get('capital_context_history', [])):
         return 'DATA_HOLD', ['Interim capital context requires complete post-transaction FD reconciliation.']
     if not c.event_review_complete: return 'DATA_HOLD', ['Material event review is incomplete.']
+    # A generic, preliminary filing is not an actionable special situation.
+    # Preserve WATCH for identifiable preliminary merger/asset/contract events,
+    # but do not surface unclassified OTHER filings as WATCH on proof=1 alone.
+    if c.event_type in {'OTHER', 'CORPORATE_ACTION', 'MATERIAL_DEFINITIVE_AGREEMENT'} and c.event_proof <= 1:
+        return 'REJECT', ['No source-verified structural special-situation catalyst.']
     if c.event_type == 'MERGER_CVR_UNVERIFIED': return 'DATA_HOLD', ['Merger consideration structure is unverified; CVR alone does not establish cash consideration.']
     if c.event_type == 'DEBT_RESTRUCTURING':
         if c.event_terms.get('materiality') == 'ROUTINE': return 'REJECT', ['Routine credit amendment without a verified structural special-situation catalyst.']

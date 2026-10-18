@@ -23,11 +23,6 @@ def evaluate_gates(c: Candidate, cfg):
     if any(x.get('context', {}).get('reconciliation_required') for x in c.event_terms.get('capital_context_history', [])):
         return 'DATA_HOLD', ['Interim capital context requires complete post-transaction FD reconciliation.']
     if not c.event_review_complete: return 'DATA_HOLD', ['Material event review is incomplete.']
-    # A generic, preliminary filing is not an actionable special situation.
-    # Preserve WATCH for identifiable preliminary merger/asset/contract events,
-    # but do not surface unclassified OTHER filings as WATCH on proof=1 alone.
-    if c.event_type in {'OTHER', 'CORPORATE_ACTION', 'MATERIAL_DEFINITIVE_AGREEMENT'} and c.event_proof <= 1:
-        return 'REJECT', ['No source-verified structural special-situation catalyst.']
     if c.event_type == 'MERGER_CVR_UNVERIFIED': return 'DATA_HOLD', ['Merger consideration structure is unverified; CVR alone does not establish cash consideration.']
     if c.event_type == 'DEBT_RESTRUCTURING':
         if c.event_terms.get('materiality') == 'ROUTINE': return 'REJECT', ['Routine credit amendment without a verified structural special-situation catalyst.']
@@ -49,6 +44,11 @@ def evaluate_gates(c: Candidate, cfg):
     if fin_age is None: return "DATA_HOLD", ["Latest 10-Q/10-K date unavailable."]
     if fin_age > cfg["financial_filing_max_age_days"]: return "DATA_HOLD", ["Financial filing is stale."]
     if not c.financial_review_complete: return "DATA_HOLD", ["Latest 10-Q/10-K second-pass review is incomplete."]
+    # A generic/non-special-situation filing can only be rejected after the
+    # mandatory cap-table and financial evidence checks have passed.
+    # Missing data is DATA_HOLD, never a silently substituted REJECT.
+    if c.event_type in {'OTHER', 'CORPORATE_ACTION', 'MATERIAL_DEFINITIVE_AGREEMENT'} and c.event_proof <= 1:
+        return 'REJECT', ['No source-verified structural special-situation catalyst.']
     if c.adv20_usd is None: reasons.append("ADV20 unavailable.")
     elif c.adv20_usd < cfg["adv20_watch_min"]: return "REJECT", ["Too illiquid for practical execution."]
     elif c.adv20_usd < cfg["adv20_pass_min"]: reasons.append("Liquidity only qualifies for WATCH.")

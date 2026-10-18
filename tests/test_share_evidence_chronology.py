@@ -34,3 +34,22 @@ def test_post_baseline_capital_action_invalidates_basic_market_cap():
     assert c.basic_market_cap() is None
     assert c.near_fd_market_cap() is None
     assert c.to_dict()["basic_market_cap"] is None
+
+
+def test_closed_warrant_exercise_creates_reconciliation_evidence_not_fd_count():
+    from ssm.capital_evidence import completed_warrant_exercise_evidence
+    closed = (
+        "The Holder agreed to exercise existing warrants to purchase 4,074,359 shares "
+        "of the Company's common stock for cash. "
+        "The Inducement Transaction closed on September 21, 2026. "
+        "The Company also agreed to issue Reload Warrants for 8,148,718 shares."
+    )
+    pending = closed.replace(
+        "The Inducement Transaction closed on September 21, 2026.",
+        "The Inducement Transaction is expected to close on September 21, 2026."
+    )
+    assert completed_warrant_exercise_evidence(closed)
+    assert not completed_warrant_exercise_evidence(pending)
+    assert not completed_warrant_exercise_evidence(
+        "The Company agreed to issue replacement warrants subject to shareholder approval."
+    )

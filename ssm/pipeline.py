@@ -12,6 +12,7 @@ from .financial_review import financial_note_hits, conservative_merge_dilution, 
 from .events import review_material_events, event_terms, event_status
 from .securities import resolve_security
 from .recapitalization import reconcile_capital_context
+from .capital_evidence import completed_warrant_exercise_evidence
 from .financial_recapitalization import financial_capital_contexts
 
 OFFERING_FORMS = {"S-1", "S-3", "424B3", "424B5"}
@@ -383,8 +384,9 @@ def build_candidate(sec, meta, filing, overrides, cfg, snapshot=None):
             and (
                 (e.get('terms', {}).get('capital_context', {}).get('actual_common_issued') or 0) > 0
                 or (e.get('terms', {}).get('capital_context', {}).get('actual_common_equivalent_shares') or 0) > 0
-                or (e.get('terms', {}).get('warrant_reconciliation_required')
-                    and e.get('event_status') == 'COMPLETED')
+                or (e.get('event_status') == 'COMPLETED'
+                    and (e.get('terms', {}).get('warrant_reconciliation_required')
+                         or completed_warrant_exercise_evidence(e.get('combined_text', ''))))
             )
         ]
         if post_baseline_events:

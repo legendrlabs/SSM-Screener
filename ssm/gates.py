@@ -44,6 +44,11 @@ def evaluate_gates(c: Candidate, cfg):
     if fin_age is None: return "DATA_HOLD", ["Latest 10-Q/10-K date unavailable."]
     if fin_age > cfg["financial_filing_max_age_days"]: return "DATA_HOLD", ["Financial filing is stale."]
     if not c.financial_review_complete: return "DATA_HOLD", ["Latest 10-Q/10-K second-pass review is incomplete."]
+    # A generic/non-special-situation filing can only be rejected after the
+    # mandatory cap-table and financial evidence checks have passed.
+    # Missing data is DATA_HOLD, never a silently substituted REJECT.
+    if c.event_type in {'OTHER', 'CORPORATE_ACTION', 'MATERIAL_DEFINITIVE_AGREEMENT'} and c.event_proof <= 1:
+        return 'REJECT', ['No source-verified structural special-situation catalyst.']
     if c.adv20_usd is None: reasons.append("ADV20 unavailable.")
     elif c.adv20_usd < cfg["adv20_watch_min"]: return "REJECT", ["Too illiquid for practical execution."]
     elif c.adv20_usd < cfg["adv20_pass_min"]: reasons.append("Liquidity only qualifies for WATCH.")

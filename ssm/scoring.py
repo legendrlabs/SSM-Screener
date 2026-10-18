@@ -20,11 +20,17 @@ def score_candidate(c: Candidate) -> float:
     return max(0.0,min(100.0,round(s,1)))
 
 def bucket_candidate(c: Candidate) -> str:
-    if c.gate_status=='EXCLUDED': return 'EXCLUDED'
-    if c.gate_status=="DATA_HOLD": return "DATA_HOLD"
-    if c.gate_status=="REJECT": return "REJECT"
-    score=c.priority_score or 0
-    if c.gate_status=="PASS" and score>=60: return "A_RESEARCH_NOW"
-    if score>=40: return "B_WATCH"
-    if score>=25: return "C_SPECULATIVE"
-    return "REJECT"
+    """Priority buckets must not contradict the independently evaluated gate.
+
+    A low research score is not an independent REJECT gate. In particular,
+    WATCH candidates must remain visible even when the score is below 25.
+    PASS with insufficient priority remains research-only, not action-ready.
+    """
+    if c.gate_status in {'EXCLUDED', 'DATA_HOLD', 'REJECT'}:
+        return c.gate_status
+    score = c.priority_score or 0
+    if c.gate_status == 'PASS' and score >= 60:
+        return 'A_RESEARCH_NOW'
+    if c.gate_status in {'PASS', 'WATCH'}:
+        return 'B_WATCH' if score >= 40 else 'C_SPECULATIVE'
+    return 'DATA_HOLD'

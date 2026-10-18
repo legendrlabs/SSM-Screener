@@ -129,13 +129,36 @@ def write_outputs(candidates,cfg,out_dir):
     q={"SAFE_TO_ACT":safe,"sec_discovery_mode":cfg.get("_sec_discovery_mode","unknown"),"candidate_count":len(candidates),"financial_review_incomplete_count":sum(not c.financial_review_complete for c in candidates),"data_hold_count":sum(c.gate_status=="DATA_HOLD" for c in candidates),"pass_count":sum(c.gate_status=="PASS" for c in candidates),"watch_count":sum(c.gate_status=="WATCH" for c in candidates),"reject_count":sum(c.gate_status=="REJECT" for c in candidates)}
     q['excluded_count']=sum(c.gate_status=='EXCLUDED' for c in candidates)
     q['active_common_count']=sum(_active_common(c) for c in candidates)
+    # Gate counts and presentation counts must agree. Scores rank candidates;
+    # they may not silently convert a WATCH or PASS into a rejected row.
+    q['watch_reported_count']=sum(c.gate_status=='WATCH' for c in candidates)
+    q['lower_priority_pass_count']=sum(c.gate_status=='PASS' and c.bucket!='A_RESEARCH_NOW' for c in candidates)
+    q['gate_bucket_mismatch_count']=sum(
+        (c.gate_status=='WATCH' and c.bucket not in {'B_WATCH','C_SPECULATIVE'})
+        or (c.gate_status=='PASS' and c.bucket not in {'A_RESEARCH_NOW','B_WATCH','C_SPECULATIVE'})
+        for c in candidates
+    )
+    q['completed_merger_fd_hold_count']=sum(
+        c.gate_status=='DATA_HOLD' and c.event_status=='COMPLETED'
+        and 'MERGER' in c.event_type for c in candidates
+    )
     q['financial_review_incomplete_count']=sum(_active_common(c) and not c.financial_review_complete for c in candidates)
     audit=summarize_invariants(candidates)
     q['invariant_violation_count']=sum(r['violations'] for r in audit['invariants'].values())
     (out/'validation_audit.json').write_text(json.dumps(audit,indent=2),encoding='utf-8')
     (out/"quality.json").write_text(json.dumps(q,indent=2),encoding="utf-8")
-    top=[c for c in candidates if c.bucket=="A_RESEARCH_NOW"][:cfg["max_candidates"]]; watch=[c for c in candidates if c.bucket in ("B_WATCH","C_SPECULATIVE")][:10]; reject=[c for c in candidates if c.bucket=="REJECT"][:10]; hold=[c for c in candidates if c.bucket=="DATA_HOLD"][:10]
-    md=["# Special Situation Microcap — latest","",f"**SAFE_TO_ACT: {'TRUE' if safe else 'FALSE'}**",""]
+    top=[c for c in candidates if c.gate_status=="PASS" and c.bucket=="A_RESEARCH_NOW"][:cfg["max_candidates"]]
+    # Do not use bucket alone to decide which gate-status rows are reported.
+    watch=[c for c in candidates if c.gate_status=="WATCH"]
+    secondary_pass=[c for c in candidates if c.gate_status=="PASS" and c.bucket!="A_RESEARCH_NOW"]
+    reject=[c for c in candidates if c.gate_status=="REJECT"][:10]
+    hold=[c for c in candidates if c.gate_status=="DATA_HOLD"][:10]
+    completed_merger_hold=[c for c in candidates
+                           if c.gate_status=="DATA_HOLD" and c.event_status=="COMPLETED"
+                           and "MERGER" in c.event_type][:15]
+    md=["# Special Situation Microcap — latest","",f"**SAFE_TO_ACT: {'TRUE' if safe else 'FALSE'}**",
+        "",f"Gate totals: PASS {q['pass_count']} / WATCH {q['watch_count']} / DATA_HOLD {q['data_hold_count']}.",
+        f"WATCH rows displayed: {len(watch)}; gate/bucket mismatches: {q['gate_bucket_mismatch_count']}.",""]
     material=[c for c in candidates if _active_common(c) and (
         c.event_type in {'MERGER_CASH_CVR','MERGER_CASH_STOCK','MERGER_STOCK','REVERSE_MERGER_CVR','MERGER_REVERSE_MERGER','LIQUIDATION_DISTRIBUTION'} or
         (c.event_type == 'DEBT_RESTRUCTURING' and c.event_terms.get('materiality') == 'STRUCTURAL') or
@@ -157,6 +180,19 @@ def write_outputs(candidates,cfg,out_dir):
     else:
         md += ["## A — RESEARCH NOW","","|Ticker|Price|Basic MC|Near-FD MC|Strict FD MC|Event|Proof|10-Q/K|Score|","|---|---:|---:|---:|---:|---|---:|---|---:|"]
         for c in top:md.append(f"|{c.ticker}|{_m(c.price)}|{_m(c.basic_market_cap())}|{_m(c.near_fd_market_cap())}|{_m(c.strict_fd_market_cap())}|{c.event_type}|{c.event_proof}|{c.latest_financial_form or ''} {c.latest_financial_filing_date or ''}|{c.priority_score}|")
+    if secondary_pass:
+        md += ["", "## PASS — LOWER PRIORITY (not actionable without further research)", ""]
+        for c in secondary_pass:
+            md.append(f"- **{c.ticker}** — {c.bucket}, gate PASS, score {c.priority_score}.")
+    if completed_merger_hold:
+        md += ["", f"## COMPLETED MERGERS — FD RECONCILIATION PENDING ({q['completed_merger_fd_hold_count']})", ""]
+        for c in completed_merger_hold:
+            md.append(
+                f"- **{c.ticker}** — {c.event_type} / COMPLETED / DATA_HOLD. "
+                f"Common evidence: {c.common_shares_source or 'not dated'}; "
+                f"FD confidence: {c.dilution.confidence}; "
+                f"unresolved: {'; '.join(c.data_warnings[:3]) or 'current cap table not reconciled'}."
+            )
     for title,arr in [("B/C — WATCH",watch),("DATA HOLD",hold),("REJECT",reject)]:
         md += ["",f"## {title}",""]
         if not arr:md.append("- None")

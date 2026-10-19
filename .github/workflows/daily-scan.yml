@@ -1,14 +1,10 @@
-name: SSM Daily Scan
+# Legacy repository archived for operations. The canonical scheduled scanner
+# and public snapshots now run in legendrlabs/SSM-Screener-public-ver.
+# Preserve manual dispatch for troubleshooting only; no automatic triggers.
+name: SSM Legacy Scan (Manual Only)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".scan-trigger/**"
-  schedule:
-    - cron: "30 11 * * 1-5"
-    - cron: "30 22 * * 1-5"
 
 concurrency:
   group: ssm-daily-scan-v2
